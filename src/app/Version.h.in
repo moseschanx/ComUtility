@@ -3,9 +3,9 @@
 // Generated from src/app/Version.h.in by CMake - do not edit the generated copy.
 
 #define APP_NAME                "@PROJECT_NAME@"
-#define APP_DISPLAY_NAME        "BuildAI Serial Utility"
-#define APP_ORGANIZATION        "BuildAI"
-#define APP_ORGANIZATION_DOMAIN "build.ai"
+#define APP_DISPLAY_NAME        "ComUtility"
+#define APP_ORGANIZATION        "ComUtility"   // internal QSettings scope only (an empty one breaks QSettings); never shown
+#define APP_ORGANIZATION_DOMAIN "moses-ai.us"
 #define APP_HOMEPAGE            "@PROJECT_HOMEPAGE_URL@"
 
 #define APP_VERSION             "@PROJECT_VERSION@"

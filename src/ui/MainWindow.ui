@@ -11,11 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>BuildAI Serial Utility</string>
+   <string>ComUtility</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../../resources/resources.qrc">
-    <normaloff>:/icons/buildai.png</normaloff>:/icons/buildai.png</iconset>
+    <normaloff>:/icons/comutility.png</normaloff>:/icons/comutility.png</iconset>
   </property>
   <property name="dockOptions">
    <set>QMainWindow::DockOption::AllowTabbedDocks|QMainWindow::DockOption::AnimatedDocks</set>
@@ -910,7 +910,7 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>&amp;About BuildAI Serial Utility</string>
+    <string>&amp;About ComUtility</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -926,7 +926,7 @@
   </action>
   <action name="actionHomepage">
    <property name="text">
-    <string>BuildAI &amp;Homepage</string>
+    <string>&amp;Homepage</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

@@ -5,13 +5,13 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../src/dialogs/AboutDialog.ui" line="+14"/>
-        <source>About BuildAI Serial Utility</source>
-        <translation>About BuildAI Serial Utility</translation>
+        <source>About ComUtility</source>
+        <translation>About ComUtility</translation>
     </message>
     <message>
         <location line="+42"/>
-        <source>BuildAI Serial Utility</source>
-        <translation>BuildAI Serial Utility</translation>
+        <source>ComUtility</source>
+        <translation>ComUtility</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -41,18 +41,18 @@
     </message>
     <message>
         <location line="+3"/>
-        <source>&lt;p&gt;A multi-tab serial-port terminal for the boards BuildAI works with every day.&lt;/p&gt;&lt;p&gt;It speaks to &lt;b&gt;Rockchip Linux boards&lt;/b&gt; (U-Boot prompt and Linux console at 115200 or 1500000 baud), to &lt;b&gt;MCU firmware shells&lt;/b&gt; (STM32, ESP32, RP2040 via CH34x, CP210x, FTDI or J-Link CDC adapters) and to anything else that talks over a UART.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Highlights&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;VT100 / xterm terminal emulation with colours, scrollback and CJK support&lt;/li&gt;&lt;li&gt;Auto-reconnect when a board reboots or a USB adapter is re-plugged&lt;/li&gt;&lt;li&gt;Quick commands, paced file send, hex view and session logging&lt;/li&gt;&lt;li&gt;Live line-parameter changes, DTR/RTS control and BREAK&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Homepage: &lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;&lt;/p&gt;</source>
-        <translation>&lt;p&gt;A multi-tab serial-port terminal for the boards BuildAI works with every day.&lt;/p&gt;&lt;p&gt;It speaks to &lt;b&gt;Rockchip Linux boards&lt;/b&gt; (U-Boot prompt and Linux console at 115200 or 1500000 baud), to &lt;b&gt;MCU firmware shells&lt;/b&gt; (STM32, ESP32, RP2040 via CH34x, CP210x, FTDI or J-Link CDC adapters) and to anything else that talks over a UART.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Highlights&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;VT100 / xterm terminal emulation with colours, scrollback and CJK support&lt;/li&gt;&lt;li&gt;Auto-reconnect when a board reboots or a USB adapter is re-plugged&lt;/li&gt;&lt;li&gt;Quick commands, paced file send, hex view and session logging&lt;/li&gt;&lt;li&gt;Live line-parameter changes, DTR/RTS control and BREAK&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Homepage: &lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;&lt;/p&gt;</translation>
+        <source>&lt;p&gt;A multi-tab serial-port terminal for everyday work with embedded boards.&lt;/p&gt;&lt;p&gt;It speaks to &lt;b&gt;Rockchip Linux boards&lt;/b&gt; (U-Boot prompt and Linux console at 115200 or 1500000 baud), to &lt;b&gt;MCU firmware shells&lt;/b&gt; (STM32, ESP32, RP2040 via CH34x, CP210x, FTDI or J-Link CDC adapters) and to anything else that talks over a UART.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Highlights&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;VT100 / xterm terminal emulation with colours, scrollback and CJK support&lt;/li&gt;&lt;li&gt;Auto-reconnect when a board reboots or a USB adapter is re-plugged&lt;/li&gt;&lt;li&gt;Quick commands, paced file send, hex view and session logging&lt;/li&gt;&lt;li&gt;Live line-parameter changes, DTR/RTS control and BREAK&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Homepage: &lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;&lt;/p&gt;</source>
+        <translation>&lt;p&gt;A multi-tab serial-port terminal for everyday work with embedded boards.&lt;/p&gt;&lt;p&gt;It speaks to &lt;b&gt;Rockchip Linux boards&lt;/b&gt; (U-Boot prompt and Linux console at 115200 or 1500000 baud), to &lt;b&gt;MCU firmware shells&lt;/b&gt; (STM32, ESP32, RP2040 via CH34x, CP210x, FTDI or J-Link CDC adapters) and to anything else that talks over a UART.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Highlights&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;VT100 / xterm terminal emulation with colours, scrollback and CJK support&lt;/li&gt;&lt;li&gt;Auto-reconnect when a board reboots or a USB adapter is re-plugged&lt;/li&gt;&lt;li&gt;Quick commands, paced file send, hex view and session logging&lt;/li&gt;&lt;li&gt;Live line-parameter changes, DTR/RTS control and BREAK&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Homepage: &lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+15"/>
-        <source>&lt;p&gt;&lt;b&gt;Copyright &amp;copy; 2026 BuildAI&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Developed by the BuildAI engineering team as a replacement for ad-hoc use of PuTTY, minicom and SecureCRT.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Built with:&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Qt %1 - cross-platform application framework (Core, Gui, Widgets, SerialPort)&lt;/li&gt;&lt;li&gt;C++20 - modern C++ standard&lt;/li&gt;&lt;li&gt;CMake and Ninja - build system&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Terminal emulation follows the VT500-series parser described at &lt;a href=&quot;https://vt100.net/emu/dec_ansi_parser&quot;&gt;vt100.net&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Copyright &amp;copy; 2026 BuildAI&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Developed by the BuildAI engineering team as a replacement for ad-hoc use of PuTTY, minicom and SecureCRT.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Built with:&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Qt %1 - cross-platform application framework (Core, Gui, Widgets, SerialPort)&lt;/li&gt;&lt;li&gt;C++20 - modern C++ standard&lt;/li&gt;&lt;li&gt;CMake and Ninja - build system&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Terminal emulation follows the VT500-series parser described at &lt;a href=&quot;https://vt100.net/emu/dec_ansi_parser&quot;&gt;vt100.net&lt;/a&gt;.&lt;/p&gt;</translation>
+        <source>&lt;p&gt;Written as a replacement for ad-hoc use of PuTTY, minicom and SecureCRT.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Built with:&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Qt %1 - cross-platform application framework (Core, Gui, Widgets, SerialPort)&lt;/li&gt;&lt;li&gt;C++20 - modern C++ standard&lt;/li&gt;&lt;li&gt;CMake and Ninja - build system&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Terminal emulation follows the VT500-series parser described at &lt;a href=&quot;https://vt100.net/emu/dec_ansi_parser&quot;&gt;vt100.net&lt;/a&gt;.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Written as a replacement for ad-hoc use of PuTTY, minicom and SecureCRT.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Built with:&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Qt %1 - cross-platform application framework (Core, Gui, Widgets, SerialPort)&lt;/li&gt;&lt;li&gt;C++20 - modern C++ standard&lt;/li&gt;&lt;li&gt;CMake and Ninja - build system&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Terminal emulation follows the VT500-series parser described at &lt;a href=&quot;https://vt100.net/emu/dec_ansi_parser&quot;&gt;vt100.net&lt;/a&gt;.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+15"/>
-        <source>&lt;p&gt;&lt;b&gt;License&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Copyright &amp;copy; 2026 BuildAI. All rights reserved.&lt;/p&gt;&lt;p&gt;This software is provided to BuildAI staff and partners for developing, testing and servicing BuildAI hardware. Redistribution outside BuildAI requires written permission.&lt;/p&gt;&lt;p&gt;Qt is used under the terms of the GNU Lesser General Public License v3. See &lt;a href=&quot;https://www.qt.io/licensing&quot;&gt;qt.io/licensing&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;License&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Copyright &amp;copy; 2026 BuildAI. All rights reserved.&lt;/p&gt;&lt;p&gt;This software is provided to BuildAI staff and partners for developing, testing and servicing BuildAI hardware. Redistribution outside BuildAI requires written permission.&lt;/p&gt;&lt;p&gt;Qt is used under the terms of the GNU Lesser General Public License v3. See &lt;a href=&quot;https://www.qt.io/licensing&quot;&gt;qt.io/licensing&lt;/a&gt;.&lt;/p&gt;</translation>
+        <location line="+14"/>
+        <source>&lt;p&gt;&lt;b&gt;License&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Copyright &amp;copy; 2026 the ComUtility author. All rights reserved.&lt;/p&gt;&lt;p&gt;ComUtility is a personal tool. Redistribution requires written permission.&lt;/p&gt;&lt;p&gt;Qt is used under the terms of the GNU Lesser General Public License v3. See &lt;a href=&quot;https://www.qt.io/licensing&quot;&gt;qt.io/licensing&lt;/a&gt;.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;License&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Copyright &amp;copy; 2026 the ComUtility author. All rights reserved.&lt;/p&gt;&lt;p&gt;ComUtility is a personal tool. Redistribution requires written permission.&lt;/p&gt;&lt;p&gt;Qt is used under the terms of the GNU Lesser General Public License v3. See &lt;a href=&quot;https://www.qt.io/licensing&quot;&gt;qt.io/licensing&lt;/a&gt;.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -3088,7 +3088,7 @@ Only replace the stored key if you are sure the change is expected.</translation
 <context>
     <name>LogReplayer</name>
     <message>
-        <location filename="../src/core/LogReplayer.cpp" line="+57"/>
+        <location filename="../src/core/LogReplayer.cpp" line="+63"/>
         <source>A replay is already running</source>
         <translation>A replay is already running</translation>
     </message>
@@ -3127,8 +3127,8 @@ Only replace the stored key if you are sure the change is expected.</translation
     <name>MainWindow</name>
     <message>
         <location filename="../src/ui/MainWindow.ui" line="+14"/>
-        <source>BuildAI Serial Utility</source>
-        <translation>BuildAI Serial Utility</translation>
+        <source>ComUtility</source>
+        <translation>ComUtility</translation>
     </message>
     <message>
         <location line="+64"/>
@@ -3817,8 +3817,8 @@ Only replace the stored key if you are sure the change is expected.</translation
     </message>
     <message>
         <location line="+8"/>
-        <source>&amp;About BuildAI Serial Utility</source>
-        <translation>&amp;About BuildAI Serial Utility</translation>
+        <source>&amp;About ComUtility</source>
+        <translation>&amp;About ComUtility</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -3827,8 +3827,8 @@ Only replace the stored key if you are sure the change is expected.</translation
     </message>
     <message>
         <location line="+8"/>
-        <source>BuildAI &amp;Homepage</source>
-        <translation>BuildAI &amp;Homepage</translation>
+        <source>&amp;Homepage</source>
+        <translation>&amp;Homepage</translation>
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="+553"/>
@@ -8260,8 +8260,8 @@ You will be asked for it when connecting.</translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>BuildAI Serial Utility</source>
-        <translation>BuildAI Serial Utility</translation>
+        <source>ComUtility</source>
+        <translation>ComUtility</translation>
     </message>
     <message>
         <location line="+10"/>

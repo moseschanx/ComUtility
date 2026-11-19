@@ -248,8 +248,8 @@ private:
 void Tst_sshdialogs::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-sshdialogs"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-sshdialogs"));
     QVERIFY(m_tempDir.isValid());
 
     // QSettings (AppSettings, SecretStore, the RemoteFileDialog paths) stays out of the
@@ -258,11 +258,11 @@ void Tst_sshdialogs::initTestCase()
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("BuildAI-Test")));
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-sshdialogs")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtility-Test")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-sshdialogs")));
 
     // The profile store's default file lives in the test-mode data directory.
-    QVERIFY(SshProfileStore::defaultFilePath().contains(QStringLiteral("SerialUtilityTest-sshdialogs")));
+    QVERIFY(SshProfileStore::defaultFilePath().contains(QStringLiteral("ComUtilityTest-sshdialogs")));
     QFile::remove(SshProfileStore::defaultFilePath());
 }
 

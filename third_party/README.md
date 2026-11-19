@@ -1,10 +1,10 @@
 # third_party: bundled flashing tools
 
-Binaries that BuildAI Serial Utility (Firmware tab, v0.5) starts as separate processes. They are
+Binaries that ComUtility (Firmware tab, v0.5) starts as separate processes. They are
 **not** linked into the application and are not built from source here. They are committed as plain
 files (about 20 MB in total) so that a checkout builds a complete package without network access.
 
-CMake assembles them into `tools/` next to the executable after every build of `SerialUtility` and
+CMake assembles them into `tools/` next to the executable after every build of `ComUtility` and
 `cmake --install` ships the same folder as `bin/tools/` (see "Packaging" in `CMakeLists.txt`). The
 application looks for `tools/upgrade_tool.exe`, `tools/adb.exe` and
 `tools/DriverAssistant/DriverInstall.exe` (Linux: `tools/upgrade_tool`) there; Preferences >
@@ -54,7 +54,7 @@ Why these particular files:
 - The only licence text Rockchip ships next to its tool is the LGPL v3 in `rockchip/windows/license.txt`;
   it is installed next to `upgrade_tool.exe` (`tools/license.txt`) so the text travels with the
   binary. The tool itself is distributed by Rockchip as a binary; this repository does not contain
-  its source and BuildAI has not modified it.
+  its source and it has not been modified.
 - adb and its DLLs are Apache 2.0 (Android Open Source Project) and unmodified from FactoryTool.
 - DriverAssistant is Rockchip's proprietary installer; it is redistributed as Rockchip supplies it.
 

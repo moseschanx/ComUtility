@@ -438,8 +438,8 @@ private:
 void Tst_dialogs::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-dialogs"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-dialogs"));
     QVERIFY(m_tempDir.isValid());
 
     // AppSettings uses the default QSettings() constructor: keep it out of the registry and
@@ -448,12 +448,12 @@ void Tst_dialogs::initTestCase()
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("BuildAI-Test")));
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-dialogs")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtility-Test")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-dialogs")));
 
     AppSettings::instance().setLogDirectory(m_tempDir.filePath(QStringLiteral("logs")));
     QVERIFY(settings.contains(QStringLiteral("logging/directory")));
-    QVERIFY(AppSettings::dataDirectory().contains(QStringLiteral("SerialUtilityTest-dialogs")));
+    QVERIFY(AppSettings::dataDirectory().contains(QStringLiteral("ComUtilityTest-dialogs")));
 }
 
 void Tst_dialogs::init()
@@ -2415,7 +2415,7 @@ void Tst_dialogs::dialogAcceptWritesStoreAndSavesJson()
 
     // ...and saved it as JSON in the (test-mode) data directory.
     QVERIFY2(QFileInfo::exists(savedPath), qPrintable(savedPath));
-    QVERIFY(savedPath.contains(QStringLiteral("SerialUtilityTest-dialogs")));
+    QVERIFY(savedPath.contains(QStringLiteral("ComUtilityTest-dialogs")));
     QuickCommandStore reloaded;
     QVERIFY(reloaded.load(savedPath));
     QVERIFY(reloaded.commands() == store.commands());
@@ -2816,15 +2816,15 @@ void Tst_dialogs::aboutDialogContent()
     QVERIFY2(credits->toPlainText().contains(QString::fromLatin1(qVersion())), qPrintable(credits->toPlainText()));
     QVERIFY(credits->toPlainText().contains(QStringLiteral("C++20")));
     QVERIFY(license->toPlainText().contains(QStringLiteral("Copyright")));
-    QVERIFY(license->toPlainText().contains(QStringLiteral("BuildAI")));
+    QVERIFY(license->toPlainText().contains(QStringLiteral("ComUtility")));
 }
 
 void Tst_dialogs::aboutDialogLogoResource()
 {
-    // AboutDialog.h: the logo is :/icons/buildai_64.png. resources/resources.qrc is listed as a
+    // AboutDialog.h: the logo is :/icons/comutility_64.png. resources/resources.qrc is listed as a
     // plain source of the executables, which only works with CMAKE_AUTORCC; qt_standard_project_setup()
     // enables AUTOMOC / AUTOUIC but not AUTORCC, so the icons are missing from every binary.
-    if (!QFile::exists(QStringLiteral(":/icons/buildai_64.png"))) {
+    if (!QFile::exists(QStringLiteral(":/icons/comutility_64.png"))) {
         QSKIP("resources.qrc is not compiled in: add set(CMAKE_AUTORCC ON) after qt_standard_project_setup() "
               "(or qt_add_resources) in CMakeLists.txt so :/icons/* exist at run time");
     }

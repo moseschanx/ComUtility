@@ -7,10 +7,10 @@ namespace Ui { class AboutDialog; }
 QT_END_NAMESPACE
 
 /**
- * "About BuildAI Serial Utility": logo (:/icons/buildai_64.png), app name + version,
+ * "About ComUtility": logo (:/icons/comutility_64.png), app name + version,
  * a short description (what the tool is for: Rockchip Linux consoles, U-Boot, MCU shells),
  * credits (Qt version, C++20) and a copyright / license text
- * ("Copyright © 2026 BuildAI. All rights reserved."). Modeless, like the reference tool.
+ * ("Copyright © 2026 the ComUtility author. All rights reserved."). Modeless, like the reference tool.
  * Layout in AboutDialog.ui: labelLogo, labelAppName, textDescription (QTextBrowser,
  * openExternalLinks), textCredits, textLicense, buttonBox (Close).
  * Retranslates itself on QEvent::LanguageChange (it can stay open across a language switch).

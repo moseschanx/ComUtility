@@ -1,4 +1,4 @@
-# BuildAI Serial Utility - C++ style (Qt-flavoured)
+# ComUtility - C++ style (Qt-flavoured)
 BasedOnStyle: LLVM
 Language: Cpp
 Standard: c++20

@@ -1,4 +1,4 @@
-# BuildAI Serial Utility — Design Specification
+# ComUtility — Design Specification
 
 **Status:** authoritative spec for the initial implementation (v0.1.0).
 **Audience:** implementers of the individual modules and reviewers.
@@ -10,7 +10,7 @@
 ## 1. Purpose
 
 A Qt 6 desktop tool that opens serial ports and acts as an interactive shell/terminal for
-the devices BuildAI works with every day:
+the devices on an embedded-boards bench every day:
 
 | Device class | Typical link | What the tool must handle well |
 |---|---|---|
@@ -47,9 +47,13 @@ it is a general terminal that speaks bytes.
 | Logging | `qCInfo(lcSerial) << ...`; routed to the System Log dock by `SystemLogViewer::installMessageHandler()` |
 | Formatting | `.clang-format` (LLVM base, 4 spaces, 120 cols, braces on new line for functions/classes) |
 
-The executable is `BuildAI-SerialUtility.exe`; QSettings uses organization `BuildAI`,
-application `SerialUtility`. Per-user data (quick commands JSON, history) lives in
-`QStandardPaths::AppConfigLocation` (`AppSettings::dataDirectory()`).
+The executable is `ComUtility.exe`; QSettings uses organization `ComUtility` (internal only: Qt needs
+a non-empty one; no organisation is shown anywhere), application `ComUtility`. Per-user data (quick commands JSON, history) lives in
+`QStandardPaths::AppConfigLocation` (`AppSettings::dataDirectory()`). Saved SSH passwords
+(`SecretStore`) are DPAPI blobs with the application entropy `ComUtility-SecretStore-v1`. Version 0.9.0
+renamed the app (scope, entropy, executable, log categories `comutility.*`); the settings of the earlier
+name are moved once by a migration script kept outside the repository, never by the app itself, so no
+earlier name is left in the code.
 
 ## 4. Architecture
 
@@ -77,7 +81,7 @@ application `SerialUtility`. Per-user data (quick commands JSON, history) lives 
 Three CMake targets: **`su_core`** (static lib: `src/app`, `src/core`, `src/ssh`, `src/firmware`,
 `src/terminal` minus `TerminalWidget`; links Core/Gui/SerialPort/Network and libssh; used by the unit tests), **`su_app`**
 (static lib: `TerminalWidget`, every widget and dialog; linked by the GUI test suites) and
-**`SerialUtility`** (the app: `main.cpp` + `su_app` + resources).
+**`ComUtility`** (the app: `main.cpp` + `su_app` + resources).
 
 ### 4.1 Data flow
 
@@ -126,7 +130,7 @@ may add private members, private slots and helper functions freely, and may add
 | `AppSettings` | typed QSettings façade + `changed(key)` | defaults documented in header |
 | `SystemLogViewer` | System Log dock; Qt message handler | reference-tool look |
 | `MainWindow` | tabs, actions, status bar, language switch, state persistence | actions listed in header |
-| `AboutDialog` / `VersionDialog` / `PreferencesDialog` | as in the Vispek reference tool, adapted | Designer `.ui` forms |
+| `AboutDialog` / `VersionDialog` / `PreferencesDialog` | as in the earlier reference tool, adapted | Designer `.ui` forms |
 
 ### 4.3 Default quick commands
 
@@ -168,7 +172,7 @@ shared file holds). Nothing else in the file is touched.
 implicit CR on LF **on**; local echo off; auto-reconnect on (1000 ms); scrollback 10 000;
 theme `dark`; font Consolas 10 (Windows) / Monospace 10; pause output while selecting **on**;
 right click pastes (cmd.exe style) **on**;
-log dir `<Documents>/BuildAI/SerialLogs`; log format `text`, include TX; confirm close when
+log dir `<Documents>/ComUtility/SerialLogs`; log format `text`, include TX; confirm close when
 connected; restore last ports.
 
 ### 4.5 Terminal emulation scope
@@ -181,7 +185,7 @@ Unknown sequences are consumed silently (debug log).
 ### 4.6 Built-in device simulator ("SIM:" pseudo-ports)
 
 `src/core/DeviceSimulator` provides four simulated devices that are listed alongside the
-real ports (manufacturer "BuildAI Simulator") when `AppSettings::showSimulatedPorts()` is
+real ports (manufacturer "ComUtility Simulator") when `AppSettings::showSimulatedPorts()` is
 on (default on; a Preferences checkbox hides them for production use):
 
 | Port | Behaviour | Exercises |
@@ -657,7 +661,7 @@ v3 text Rockchip ships with it - and `revison.log`), `rockchip/linux/` (`upgrade
 `config.ini`, `88-rockusb.rules`), `adb/` (`adb.exe`, `AdbWinApi.dll`, `AdbWinUsbApi.dll` from
 FactoryTool v1.91: its adb 1.0.41 supports `forward tcp:0` and shell_v2) and
 `DriverAssistant/DriverAssitant_v5.14.zip`. CMake assembles `tools/` next to the executable after
-each link of `SerialUtility` (the zip is extracted once at configure time and flattened so that
+each link of `ComUtility` (the zip is extracted once at configure time and flattened so that
 `tools/DriverAssistant/DriverInstall.exe` exists; Windows only) and `cmake --install` ships it as
 `bin/tools/`; the portable zip, the tarball and the installer take `bin/` recursively. The Inno
 Setup script has an optional, unchecked task "Install the Rockchip USB drivers (DriverAssistant)"
@@ -711,7 +715,7 @@ and the tarball.
 |---|---|---|
 | `FirmwareJob` | `src/firmware/FirmwareJob.{h,cpp}` (0.5.1, `su_core`) | The chain: operations, steps, rules, messages, the callbacks for the decisions. Shared with the tab; 0.6.0 added the machine-wide operation lock and `layoutReadFinished()`. |
 | `FirmwareCli` | `src/firmware/FirmwareCli.{h,cpp}` (`su_core`, UI-free) | The command line: `int run(arguments, out, err)` parses one command (a `QCommandLineParser` per command), checks every input before anything runs (usage errors exit 2 on `err`), configures a fresh `FirmwareJob` from the options and the app's settings, answers its callbacks, runs one operation on a local event loop until `operationFinished()`, writes the output and maps the result to the exit code. Hooks for the tests and `main.cpp`: the `ToolRunner`, the stdin line reader (and whether it is a terminal), the profile store, fixed tool paths, a job-setup callback; `interrupt()` for Ctrl+C. |
-| `main.cpp` | `src/cli/main.cpp` | The process: `QCoreApplication` with the app's organisation / application names (so `AppSettings`, the SSH profiles and `SecretStore` are the GUI's), stdout / stderr / stdin, the terminal's echo while a password is typed, `SIGINT` / `SIGTERM` / `SIGHUP` (/ `SIGBREAK`) counted by the handler and passed to `interrupt()` by a 100 ms timer and after every read from stdin, the `buildai.*` logging categories muted (the job mirrors every line to `lcFirmware`; `QT_LOGGING_RULES` turns them back on), UTF-8 console output on Windows (the console's code page back on every way out of `main()`). |
+| `main.cpp` | `src/cli/main.cpp` | The process: `QCoreApplication` with the app's organisation / application names (so `AppSettings`, the SSH profiles and `SecretStore` are the GUI's), stdout / stderr / stdin, the terminal's echo while a password is typed, `SIGINT` / `SIGTERM` / `SIGHUP` (/ `SIGBREAK`) counted by the handler and passed to `interrupt()` by a 100 ms timer and after every read from stdin, the `comutility.*` logging categories muted (the job mirrors every line to `lcFirmware`; `QT_LOGGING_RULES` turns them back on), UTF-8 console output on Windows (the console's code page back on every way out of `main()`). |
 
 **Commands** (`FirmwareCli::commands()`): `status` (the device status query, `Board: <the tab's
 status line>`; a running board's layout is read once and stored like the tab does; `--mcu` adds
@@ -1627,10 +1631,10 @@ Packages build in isolation with `scripts/build.ps1 -BuildDir build/<pkg> -KeepG
 |---|---|---|
 | **core** | `src/app/Logging.cpp`, `src/app/AppSettings.cpp`, `src/core/*.cpp`, `tests/tst_hexutils.cpp`, `tst_lineending.cpp`, `tst_commandhistory.cpp`, `tst_quickcommand.cpp`, `tst_serialsettings.cpp` | `su_core`, the five tests |
 | **term-core** | `src/terminal/CharWidth.cpp`, `TerminalScreen.cpp`, `AnsiParser.cpp`, `TerminalTheme.cpp`, `tests/tst_charwidth.cpp`, `tst_terminalscreen.cpp`, `tst_ansiparser.cpp`, `docs/TERMINAL_EMULATION.md` | `su_core`, the three tests |
-| **term-widget** | `src/terminal/TerminalWidget.cpp`, `src/ui/HexDumpView.cpp` | `SerialUtility` (compile only) |
-| **ui-session** | `src/ui/SessionWidget.cpp`, `ConnectionBar.cpp`, `CommandInput.cpp`, `QuickCommandBar.cpp` | `SerialUtility` (compile only) |
-| **ui-main** | `src/main.cpp`, `src/ui/MainWindow.cpp`, `MainWindow.ui`, `src/ui/SystemLogViewer.cpp` | `SerialUtility` (compile only) |
-| **dialogs-docs** | `src/dialogs/*.cpp`, `src/dialogs/*.ui`, `README.md`, `docs/QUICKSTART.md`, `.github/workflows/build.yml` | `SerialUtility` (compile only) |
+| **term-widget** | `src/terminal/TerminalWidget.cpp`, `src/ui/HexDumpView.cpp` | `ComUtility` (compile only) |
+| **ui-session** | `src/ui/SessionWidget.cpp`, `ConnectionBar.cpp`, `CommandInput.cpp`, `QuickCommandBar.cpp` | `ComUtility` (compile only) |
+| **ui-main** | `src/main.cpp`, `src/ui/MainWindow.cpp`, `MainWindow.ui`, `src/ui/SystemLogViewer.cpp` | `ComUtility` (compile only) |
+| **dialogs-docs** | `src/dialogs/*.cpp`, `src/dialogs/*.ui`, `README.md`, `docs/QUICKSTART.md`, `.github/workflows/build.yml` | `ComUtility` (compile only) |
 
 After integration: full build, tests green, `windeployqt` deploy, manual run against
 COM8 (CH343 → Rockchip board) and COM6 (J-Link CDC → MCU).

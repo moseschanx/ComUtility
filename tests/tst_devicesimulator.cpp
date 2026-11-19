@@ -131,8 +131,8 @@ private:
 void Tst_devicesimulator::initTestCase()
 {
     // Isolated QSettings scope so the tests never touch the real application's preferences.
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Tests"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtility-tst_devicesimulator"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Tests"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-devicesimulator"));
     QSettings().clear();
     m_savedShowSimulated = AppSettings::instance().showSimulatedPorts();
 }
@@ -204,12 +204,12 @@ void Tst_devicesimulator::entries()
     QCOMPARE(list.at(2).portName, QStringLiteral("SIM:uboot"));
     QCOMPARE(list.at(3).portName, QStringLiteral("SIM:mcu"));
     for (const SerialPortEntry& e : list) {
-        QCOMPARE(e.manufacturer, QStringLiteral("BuildAI Simulator"));
+        QCOMPARE(e.manufacturer, QStringLiteral("ComUtility Simulator"));
         QVERIFY(!e.description.isEmpty());
         QVERIFY(!e.hasVidPid);
         QVERIFY(e.displayText().startsWith(e.portName + QStringLiteral(" - ")));
         QVERIFY2(e.kindHint().contains(QStringLiteral("simulator"), Qt::CaseInsensitive), qPrintable(e.kindHint()));
-        QVERIFY(e.toolTip().contains(QStringLiteral("BuildAI Simulator")));
+        QVERIFY(e.toolTip().contains(QStringLiteral("ComUtility Simulator")));
     }
 }
 
@@ -352,7 +352,7 @@ void Tst_devicesimulator::linuxBootAndLogin()
     const QByteArray login = exchange(sim, "s3cret\r");
     QVERIFY(!login.contains("s3cret"));
     QVERIFY(login.startsWith("\r\n"));
-    QVERIFY(login.contains("Welcome to BuildAI Linux (rv1106)"));
+    QVERIFY(login.contains("Welcome to Rockchip Linux (rv1106)"));
     QVERIFY(login.endsWith(kLinuxPrompt));
 }
 
@@ -490,7 +490,7 @@ void Tst_devicesimulator::linuxCommands()
     QVERIFY(out.contains("\x1b[48;2;"));
     QVERIFY(out.contains("\x1b[1mbold\x1b[0m"));
     out = exchange(*sim, "chinese\r");
-    QVERIFY(out.contains(QString::fromUtf8("欢迎使用 BuildAI 串口工具").toUtf8()));
+    QVERIFY(out.contains(QString::fromUtf8("欢迎使用 ComUtility 串口工具").toUtf8()));
     out = exchange(*sim, "wide\r");
     QVERIFY(out.contains(QString::fromUtf8("┌").toUtf8()));
     QVERIFY(out.contains(QString::fromUtf8("你好世界").toUtf8()));
@@ -879,13 +879,13 @@ void Tst_devicesimulator::mcuShell()
     QCOMPARE(kMcuBaud, 115200);
     sim.start();
     const QByteArray banner = flush(sim);
-    QVERIFY(banner.contains("BuildAI MCU shell v1.0 (STM32F4 @168MHz)"));
+    QVERIFY(banner.contains("Demo MCU shell v1.0 (STM32F4 @168MHz)"));
     QVERIFY(banner.endsWith("> "));
 
     QByteArray out = exchange(sim, "help\r");
     QVERIFY(out.contains("telemetry on|off"));
     QVERIFY(out.endsWith("> "));
-    QVERIFY(exchange(sim, "version\r").contains("BuildAI MCU shell v1.0"));
+    QVERIFY(exchange(sim, "version\r").contains("Demo MCU shell v1.0"));
     QVERIFY(exchange(sim, "led on\r").contains("LED is ON"));
     QVERIFY(exchange(sim, "led toggle\r").contains("LED is OFF"));
     QVERIFY(exchange(sim, "led\r").contains("usage: led on|off|toggle"));
@@ -900,9 +900,9 @@ void Tst_devicesimulator::mcuShell()
 
     // LF-terminated lines are accepted, CRLF executes once.
     out = exchange(sim, "version\n");
-    QCOMPARE(out.count("BuildAI MCU shell v1.0"), 1);
+    QCOMPARE(out.count("Demo MCU shell v1.0"), 1);
     out = exchange(sim, "version\r\n");
-    QCOMPARE(out.count("BuildAI MCU shell v1.0"), 1);
+    QCOMPARE(out.count("Demo MCU shell v1.0"), 1);
     QCOMPARE(out.count("> "), 1);
 
     // Ctrl+C / Ctrl+D / Ctrl+L mean nothing to the MCU shell.
@@ -917,7 +917,7 @@ void Tst_devicesimulator::mcuAtCommands()
 
     QCOMPARE(exchange(sim, "AT\r\n"), QByteArrayLiteral("AT\r\nOK\r\n> "));
     QByteArray out = exchange(sim, "at+gmr\r");
-    QVERIFY(out.contains("SDK version: v1.0.0-buildai"));
+    QVERIFY(out.contains("SDK version: v1.0.0-sim"));
     QVERIFY(out.endsWith("OK\r\n> "));
     QVERIFY(exchange(sim, "AT+FOO=1\r").contains("\r\nERROR\r\n"));
 
@@ -973,7 +973,7 @@ void Tst_devicesimulator::mcuResetAndVanish()
     flush(sim);
     QByteArray out = exchange(sim, "reset\r");
     QVERIFY(out.contains("Resetting..."));
-    QVERIFY(out.contains("BuildAI MCU shell v1.0"));
+    QVERIFY(out.contains("Demo MCU shell v1.0"));
     QVERIFY(out.endsWith("> "));
 
     QSignalSpy vanished(&sim, &DeviceSimulator::vanished);
@@ -1115,7 +1115,7 @@ void Tst_devicesimulator::connectionReconnectsAfterSimulatedReset()
     QCOMPARE(events, (QStringList{QStringLiteral("state:Connected"), QStringLiteral("reconnected:SIM:mcu"),
                                   QStringLiteral("connectionRestored:SIM:mcu")}));
     QVERIFY(DeviceSimulator::isPresent(QStringLiteral("SIM:mcu")));
-    QTRY_VERIFY_WITH_TIMEOUT(rx.data.contains("BuildAI MCU shell v1.0"), 2000);
+    QTRY_VERIFY_WITH_TIMEOUT(rx.data.contains("Demo MCU shell v1.0"), 2000);
     QTest::qWait(2000);
     QCOMPARE(reconnected.count(), 1);   // no second reconnect fires after an explicit open
     QCOMPARE(errors.count(), 1);        // reconnect attempts never spam errorOccurred()
@@ -1264,13 +1264,13 @@ void Tst_devicesimulator::textAgainWhenMatched()
     QVERIFY(!sim.baudRateMatches());
     sim.start();
     const QByteArray banner = flush(sim);
-    QVERIFY(!banner.contains("BuildAI MCU shell"));
+    QVERIFY(!banner.contains("Demo MCU shell"));
     QVERIFY(!banner.isEmpty());
     // Still at the prompt underneath; readable as soon as the rates match.
     sim.setBaudRate(115200);
     QVERIFY(sim.baudRateMatches());
     QByteArray out = exchange(sim, "version\r");
-    QVERIFY2(out.contains("BuildAI MCU shell v1.0"), out.constData());
+    QVERIFY2(out.contains("Demo MCU shell v1.0"), out.constData());
     QVERIFY(out.endsWith("> "));
     // Mismatch again: the reply to a *matched* command that is still queued is garbled as it
     // leaves the device (what a real UART does when the host changes rate mid-line).
@@ -1280,7 +1280,7 @@ void Tst_devicesimulator::textAgainWhenMatched()
     QVERIFY(!out.isEmpty());
     QVERIFY(!out.contains("telemetry"));
     sim.setBaudRate(115200);
-    QVERIFY(exchange(sim, "version\r").contains("BuildAI MCU shell v1.0"));
+    QVERIFY(exchange(sim, "version\r").contains("Demo MCU shell v1.0"));
 }
 
 void Tst_devicesimulator::nativeRateSwitchMidSession()

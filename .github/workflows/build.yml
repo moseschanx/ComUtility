@@ -100,7 +100,7 @@ jobs:
       - name: Install and deploy (Qt deploy script)
         run: |
           cmake --install build --prefix "$GITHUB_WORKSPACE/dist" --config Release
-          test -x dist/bin/BuildAI-SerialUtility
+          test -x dist/bin/ComUtility
           test -f dist/bin/qt.conf
           # NO_UNSUPPORTED_PLATFORM_ERROR in CMakeLists.txt would let a no-op deploy pass silently,
           # so check that the Qt libraries and the xcb platform plugin really were copied.
@@ -124,16 +124,16 @@ jobs:
           # The deploy tool sets RUNPATH=$ORIGIN/../lib on the installed binary. install-qt-action
           # exports LD_LIBRARY_PATH (which outranks RUNPATH), so check with it unset: every Qt lib
           # must resolve from dist/lib and nothing may be unresolved.
-          readelf -d dist/bin/BuildAI-SerialUtility | grep -E 'RPATH|RUNPATH' | grep -q '\$ORIGIN/../lib'
-          env -u LD_LIBRARY_PATH ldd dist/bin/BuildAI-SerialUtility
-          ! env -u LD_LIBRARY_PATH ldd dist/bin/BuildAI-SerialUtility | grep -q 'not found'
+          readelf -d dist/bin/ComUtility | grep -E 'RPATH|RUNPATH' | grep -q '\$ORIGIN/../lib'
+          env -u LD_LIBRARY_PATH ldd dist/bin/ComUtility
+          ! env -u LD_LIBRARY_PATH ldd dist/bin/ComUtility | grep -q 'not found'
           # (RUNPATH resolution prints the path as dist/bin/../lib/, hence the optional "bin/../")
-          env -u LD_LIBRARY_PATH ldd dist/bin/BuildAI-SerialUtility | grep libQt6Core | grep -qE "$PWD/dist/(bin/\.\./)?lib/"
-          env -u LD_LIBRARY_PATH ldd dist/bin/BuildAI-SerialUtility | grep libssh | grep -qE "$PWD/dist/(bin/\.\./)?lib/"
+          env -u LD_LIBRARY_PATH ldd dist/bin/ComUtility | grep libQt6Core | grep -qE "$PWD/dist/(bin/\.\./)?lib/"
+          env -u LD_LIBRARY_PATH ldd dist/bin/ComUtility | grep libssh | grep -qE "$PWD/dist/(bin/\.\./)?lib/"
           # and the package really starts on its own with the deployed xcb plugin (what end users
           # get): --version constructs QApplication, then prints the version and exits
-          xvfb-run -a env -u LD_LIBRARY_PATH dist/bin/BuildAI-SerialUtility --version
-          file dist/bin/BuildAI-SerialUtility
+          xvfb-run -a env -u LD_LIBRARY_PATH dist/bin/ComUtility --version
+          file dist/bin/ComUtility
           # su-fw, the console tool (v0.6.0): next to the GUI, resolving everything from dist/lib, and
           # it starts (QCoreApplication: no display needed)
           test -x dist/bin/su-fw
@@ -148,13 +148,13 @@ jobs:
       - name: Package tarball
         run: |
           mkdir -p out
-          tar -czf "out/BuildAI-SerialUtility-${{ needs.version.outputs.version }}-linux-x64.tar.gz" -C dist .
+          tar -czf "out/ComUtility-${{ needs.version.outputs.version }}-linux-x64.tar.gz" -C dist .
           ls -la out
 
       - name: Upload Linux package
         uses: actions/upload-artifact@v4
         with:
-          name: BuildAI-SerialUtility-linux-x64
+          name: ComUtility-linux-x64
           path: out/*.tar.gz
           if-no-files-found: error
           retention-days: 14
@@ -208,7 +208,7 @@ jobs:
         shell: pwsh
         run: |
           cmake --install build --prefix "$env:GITHUB_WORKSPACE\dist" --config Release
-          $required = @('dist\bin\BuildAI-SerialUtility.exe', 'dist\bin\su-fw.exe', 'dist\bin\qt.conf', 'dist\bin\Qt6Core.dll',
+          $required = @('dist\bin\ComUtility.exe', 'dist\bin\su-fw.exe', 'dist\bin\qt.conf', 'dist\bin\Qt6Core.dll',
                         'dist\bin\Qt6SerialPort.dll', 'dist\bin\Qt6Widgets.dll', 'dist\bin\Qt6Network.dll',
                         'dist\bin\platforms\qwindows.dll',
                         # SSH: libssh built from source plus the OpenSSL crypto DLL it depends on
@@ -237,7 +237,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path out | Out-Null
           Copy-Item README.md, VERSION.txt dist\bin\
-          Compress-Archive -Path dist\bin\* -DestinationPath "out\BuildAI-SerialUtility-${{ needs.version.outputs.version }}-windows-x64.zip" -CompressionLevel Optimal
+          Compress-Archive -Path dist\bin\* -DestinationPath "out\ComUtility-${{ needs.version.outputs.version }}-windows-x64.zip" -CompressionLevel Optimal
           Get-ChildItem out
 
       - name: Install Inno Setup
@@ -249,14 +249,14 @@ jobs:
         run: |
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
           if (-not (Test-Path $iscc)) { $iscc = (Get-Command ISCC.exe).Source }
-          & $iscc "/DAppVersion=${{ needs.version.outputs.version }}" "/DSourceDir=$env:GITHUB_WORKSPACE\dist\bin" "/DOutputDir=$env:GITHUB_WORKSPACE\out" packaging\windows\BuildAI-SerialUtility.iss
+          & $iscc "/DAppVersion=${{ needs.version.outputs.version }}" "/DSourceDir=$env:GITHUB_WORKSPACE\dist\bin" "/DOutputDir=$env:GITHUB_WORKSPACE\out" packaging\windows\ComUtility.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Get-ChildItem out
 
       - name: Upload Windows packages
         uses: actions/upload-artifact@v4
         with:
-          name: BuildAI-SerialUtility-windows-x64
+          name: ComUtility-windows-x64
           path: |
             out/*.zip
             out/*-setup.exe
@@ -293,7 +293,7 @@ jobs:
           mv artifacts/*.tar.gz artifacts/*.zip artifacts/*-setup.exe release/
           (cd release && sha256sum -- * > SHA256SUMS.txt)
           {
-            echo "## BuildAI Serial Utility ${version}"
+            echo "## ComUtility ${version}"
             echo
             # the block of VERSION.txt that belongs to this version (from "V<version>" up to the next "V" heading)
             awk -v v="V${version}" '
@@ -306,9 +306,9 @@ jobs:
             echo
             echo "| File | Contents |"
             echo "|---|---|"
-            echo "| \`BuildAI-SerialUtility-${version}-windows-x64-setup.exe\` | Windows installer (x64) |"
-            echo "| \`BuildAI-SerialUtility-${version}-windows-x64.zip\` | Windows portable build (unzip and run) |"
-            echo "| \`BuildAI-SerialUtility-${version}-linux-x64.tar.gz\` | Linux x86-64 build with Qt libraries (run \`bin/BuildAI-SerialUtility\`; the command-line tool is \`bin/su-fw\`) |"
+            echo "| \`ComUtility-${version}-windows-x64-setup.exe\` | Windows installer (x64) |"
+            echo "| \`ComUtility-${version}-windows-x64.zip\` | Windows portable build (unzip and run) |"
+            echo "| \`ComUtility-${version}-linux-x64.tar.gz\` | Linux x86-64 build with Qt libraries (run \`bin/ComUtility\`; the command-line tool is \`bin/su-fw\`) |"
             echo "| \`SHA256SUMS.txt\` | checksums |"
             echo
             echo "Built with Qt ${QT_VERSION}. Windows: MSVC 2022, requires the Visual C++ 2022 runtime (\`vc_redist.x64.exe\` is included)."
@@ -319,7 +319,7 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          name: BuildAI Serial Utility ${{ needs.version.outputs.version }}
+          name: ComUtility ${{ needs.version.outputs.version }}
           body_path: release/RELEASE_NOTES.md
           files: |
             release/*.tar.gz

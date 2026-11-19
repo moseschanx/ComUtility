@@ -447,8 +447,8 @@ private:
 void Tst_mainwindow::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-mainwindow"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-mainwindow"));
     QVERIFY(m_tempDir.isValid());
 
     // AppSettings uses the default QSettings() constructor: keep it out of the registry and
@@ -457,13 +457,13 @@ void Tst_mainwindow::initTestCase()
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("BuildAI-Test")));
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-mainwindow")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtility-Test")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-mainwindow")));
 
     AppSettings::instance().setLogDirectory(m_tempDir.filePath(QStringLiteral("logs")));
     QVERIFY(settings.contains(QStringLiteral("logging/directory")));
     // Quick commands / history go to the test-mode data directory, never the real one.
-    QVERIFY(!AppSettings::dataDirectory().contains(QStringLiteral("/BuildAI/SerialUtility")));
+    QVERIFY(!AppSettings::dataDirectory().contains(QStringLiteral("/ComUtility/ComUtility")));
 
     QDesktopServices::setUrlHandler(QStringLiteral("file"), &m_urls, "handle");
     QDesktopServices::setUrlHandler(QStringLiteral("http"), &m_urls, "handle");
@@ -2114,7 +2114,7 @@ void Tst_mainwindow::sshProfilesDialogOpens()
 void Tst_mainwindow::sshProfileStoreSavedAndReloaded()
 {
     const QString path = SshProfileStore::defaultFilePath();
-    QVERIFY2(!path.contains(QStringLiteral("/BuildAI/SerialUtility/")), qPrintable(path));   // test-mode data dir
+    QVERIFY2(!path.contains(QStringLiteral("/ComUtility/ComUtility/")), qPrintable(path));   // test-mode data dir
     QFile::remove(path);
 
     QString id;
@@ -2624,7 +2624,7 @@ void Tst_mainwindow::shortcutEntriesContract()
                                  {"actionNextTab", "Window > Next Tab", "Ctrl+Tab"},
                                  {"actionSelectTab1", "Window > Tab 1", "Alt+1"},
                                  {"actionSelectTab9", "Window > Tab 9", "Alt+9"},
-                                 {"actionAbout", "Help > About BuildAI Serial Utility", ""}};
+                                 {"actionAbout", "Help > About ComUtility", ""}};
     for (const Expected& e : expected) {
         const ShortcutEntry* entry = find(e.name);
         QVERIFY2(entry != nullptr, e.name);
@@ -3058,13 +3058,13 @@ void Tst_mainwindow::sysLogRoutesQtMessages()
     QTRY_VERIFY2(viewerText(viewer).contains(QStringLiteral("hello-sysLog")), qPrintable(viewerText(viewer)));
     const QString text = viewerText(viewer);
     QVERIFY2(text.contains(QStringLiteral("WARN")), qPrintable(text));
-    QVERIFY2(text.contains(QStringLiteral("buildai.app")), qPrintable(text));
+    QVERIFY2(text.contains(QStringLiteral("comutility.app")), qPrintable(text));
 
     qCInfo(lcSerial) << "info-sysLog" << 42;
     qCCritical(lcUi) << "critical-sysLog";
     QCoreApplication::processEvents();
     QTRY_VERIFY(viewerText(viewer).contains(QStringLiteral("info-sysLog 42")));
-    QVERIFY(viewerText(viewer).contains(QStringLiteral("buildai.serial")));
+    QVERIFY(viewerText(viewer).contains(QStringLiteral("comutility.serial")));
     QVERIFY(viewerText(viewer).contains(QStringLiteral("critical-sysLog")));
     QVERIFY(viewerText(viewer).contains(QStringLiteral("ERROR")));
 

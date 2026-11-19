@@ -128,14 +128,14 @@ private:
 void Tst_bauddetector::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-bauddetector"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-bauddetector"));
     QVERIFY(m_tempDir.isValid());
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-bauddetector")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-bauddetector")));
     AppSettings::instance().setShowSimulatedPorts(true);
 }
 
@@ -170,7 +170,7 @@ void Tst_bauddetector::scoreBootLog()
 void Tst_bauddetector::scoreCjk()
 {
     QByteArray log = bootLog();
-    log += QString::fromUtf8("本机信息：瑞芯微 RV1106 开发板，内核 5.10.160，欢迎使用 BuildAI Linux\r\n").toUtf8();
+    log += QString::fromUtf8("本机信息：瑞芯微 RV1106 开发板，内核 5.10.160，欢迎使用 Rockchip Linux\r\n").toUtf8();
     log += QString::fromUtf8("┌──────────┬──────────┐\r\n│ 中文测试 │ ASCII    │\r\n").toUtf8();
     log += QString::fromUtf8("Wide: 漢字 かな カナ 한글 ｆｕｌｌｗｉｄｔｈ | narrow: abc, emoji 😀 done\r\n").toUtf8();
     const double score = BaudRateDetector::textScore(log);

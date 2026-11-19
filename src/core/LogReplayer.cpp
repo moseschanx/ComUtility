@@ -16,7 +16,13 @@ constexpr qint64 kUnlimitedSliceMs = 8;   ///< unlimited speed: feed chunks for 
 constexpr qint64 kMaxFileBytes = 64LL * 1024 * 1024;
 constexpr qint64 kDetectHeadBytes = 4096;
 constexpr int kTimestampPrefixLength = 26;   ///< "[yyyy-MM-dd HH:mm:ss.zzz] "
-const char kHeaderPrefix[] = "# BuildAI Serial Utility log";
+
+/// True when `line` is a SessionLogger header ("# <app name> log - <port> <settings> - started <time>").
+/// Matched by shape, not by the app name, so captures written under an earlier name still count.
+bool isLoggerHeader(const QByteArray& line)
+{
+    return line.startsWith("# ") && line.contains(" log - ") && line.contains(" - started ");
+}
 
 /// True when `line` starts with a SessionLogger text-format timestamp prefix.
 bool hasTimestampPrefix(const QByteArray& line)
@@ -195,7 +201,7 @@ LogReplayer::Format LogReplayer::detectFormat(const QByteArray& head)
         if (line.trimmed().isEmpty()) {
             continue;   // skip leading blank lines
         }
-        if (hasTimestampPrefix(line) || line.startsWith(kHeaderPrefix)) {
+        if (hasTimestampPrefix(line) || isLoggerHeader(line)) {
             return Format::TimestampedText;
         }
         return Format::Raw;

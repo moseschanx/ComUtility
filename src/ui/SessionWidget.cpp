@@ -766,7 +766,7 @@ void SessionWidget::startLoggingTo(const QString& filePath)
 
     const AppSettings& s = AppSettings::instance();
     const SessionLogger::Format format = SessionLogger::formatFromString(s.logFormat());
-    // SessionLogger wraps this as "# BuildAI Serial Utility log - <port> <settings> - started <time>".
+    // SessionLogger wraps this as "# ComUtility log - <port> <settings> - started <time>".
     const QString name = m_transport->displayName();
     const QString port = name.isEmpty() ? tr("(no port)") : name;
     const QString header = QStringLiteral("%1 %2").arg(port, m_transport->summary());

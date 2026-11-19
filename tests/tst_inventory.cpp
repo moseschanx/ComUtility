@@ -359,10 +359,10 @@ private:
 void Tst_inventory::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
     // (v0.8.0) The pid in the name: the test-mode data folder (firmware.lock, inventory.json) is this
     // run's own, so two runs of the suite at once (two build folders) never meet on the lock.
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-inventory-%1").arg(QCoreApplication::applicationPid()));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-inventory-%1").arg(QCoreApplication::applicationPid()));
     QVERIFY(m_settingsDir.isValid());
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_settingsDir.filePath(QStringLiteral("settings")));
@@ -370,7 +370,7 @@ void Tst_inventory::initTestCase()
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     qputenv("SU_SSH_IGNORE_CONFIG", "1");   // the SSH connects of this suite must not read ~/.ssh/config
     qunsetenv("SSH_AUTH_SOCK");             // nor offer the developer's agent keys to the test server
-    QLoggingCategory::setFilterRules(QStringLiteral("buildai.*.info=false"));
+    QLoggingCategory::setFilterRules(QStringLiteral("comutility.*.info=false"));
 }
 
 void Tst_inventory::cleanupTestCase()

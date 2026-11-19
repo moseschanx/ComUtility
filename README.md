@@ -1,8 +1,8 @@
-# BuildAI Serial Utility
+# ComUtility
 
 CI: `.github/workflows/build.yml` builds and tests on Ubuntu and Windows for every push and publishes a release on `v*` tags.
 
-A multi-tab serial-port terminal for the boards BuildAI works with every day: **Rockchip
+A multi-tab serial-port terminal for everyday work with embedded boards: **Rockchip
 Linux boards** (U-Boot prompt and Linux console at 115200 or 1 500 000 baud) and **MCU firmware
 shells** (STM32 / ESP32 / RP2040 behind CH34x, CP210x, FTDI or J-Link CDC adapters). It replaces
 ad-hoc use of PuTTY, minicom and SecureCRT with a tool that logs everything, remembers your
@@ -11,7 +11,7 @@ other tools.
 
 The terminal itself contains **no device-specific protocol logic**: it is a general terminal that
 speaks bytes. The one device-specific part is the **Firmware tab** (v0.5), a separate tab that
-flashes the BuildAI Node board (Rockchip RV1106 SoC + TI CC1310 RF MCU) over its USB-C cable.
+flashes the Node board (Rockchip RV1106 SoC + TI CC1310 RF MCU) over its USB-C cable.
 
 ## Features
 
@@ -91,7 +91,7 @@ flashes the BuildAI Node board (Rockchip RV1106 SoC + TI CC1310 RF MCU) over its
   from a customer log, or demo the tool without hardware.
 - **Hex view** - toggle a bounded RX / TX hex dump with timestamps for the current session.
 - **System Log dock** - every Qt message (`qCInfo(lcSerial)` and friends) colour-coded by
-  severity, like the Vispek reference tool.
+  severity, like the earlier reference tool.
 - **Keyboard first** - every action has a shortcut; Tab is delivered to the device when the
   terminal has focus.
 - **English / Chinese UI**, switchable at run time.
@@ -157,8 +157,8 @@ There are two kinds of Qt Test suites under `tests/`:
   (`tst_terminalwidget`, `tst_sessionwidget`, `tst_mainwindow`, `tst_dialogs`, `tst_firmwaretab`). They talk to the
   built-in `SIM:` pseudo-ports, never to a real COM port, and they run **offscreen**: ctest sets
   `QT_QPA_PLATFORM=offscreen` for every test, so no window appears and the suites also pass on a
-  headless CI runner. Each GUI suite uses its own QSettings scope (`BuildAI-Test` /
-  `SerialUtilityTest-<suite>`, INI format in a temporary directory) and a temporary log
+  headless CI runner. Each GUI suite uses its own QSettings scope (`ComUtility-Test` /
+  `ComUtilityTest-<suite>`, INI format in a temporary directory) and a temporary log
   directory, so running them never touches your real settings or logs. To run a suite by hand:
 
 ```powershell
@@ -201,7 +201,7 @@ sudo apt install build-essential cmake ninja-build \
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
-./build/BuildAI-SerialUtility
+./build/ComUtility
 ```
 
 **B. Qt 6.8.3 from the Qt online installer or `aqtinstall` (what CI does; works on any distro).**
@@ -215,7 +215,7 @@ aqt install-qt linux desktop 6.8.3 linux_gcc_64 -m qtserialport -O ~/Qt
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/Qt/6.8.3/gcc_64
 cmake --build build
 QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
-./build/BuildAI-SerialUtility
+./build/ComUtility
 ```
 
 ### Qt Creator
@@ -226,7 +226,7 @@ QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
 ### Deploying
 
 `cmake --install build --prefix dist` (or `build.ps1 -Deploy`) copies the executables
-(`BuildAI-SerialUtility` and the `su-fw` console tool) to `dist/bin` and runs `windeployqt` / the
+(`ComUtility` and the `su-fw` console tool) to `dist/bin` and runs `windeployqt` / the
 Qt deploy script for each, so the folder is self-contained.
 The Linux tarball published by CI is built the same way (`bin/`, `lib/`, `plugins/`, `qt.conf`)
 and is self-contained except for the system X11/xcb libraries, which users install via apt:
@@ -245,8 +245,8 @@ they landed after `cmake --install`.
 .\scripts\package.ps1 -SkipBuild # package an existing dist\Release\bin
 ```
 
-Produces `dist\BuildAI-SerialUtility-<version>-windows-x64.zip`,
-`dist\installer\BuildAI-SerialUtility-<version>-windows-x64-setup.exe` (needs
+Produces `dist\ComUtility-<version>-windows-x64.zip`,
+`dist\installer\ComUtility-<version>-windows-x64-setup.exe` (needs
 [Inno Setup 6](https://jrsoftware.org/isdl.php): `winget install JRSoftware.InnoSetup`) and
 `dist\SHA256SUMS.txt`. The installer script lives in `packaging/windows/`. Its optional task
 **Install the Rockchip USB drivers (DriverAssistant)** (unchecked by default) starts the bundled
@@ -268,12 +268,12 @@ release notes):
 ```powershell
 # 1. bump the version in CMakeLists.txt and add the Vx.y.z block to VERSION.txt, commit
 # 2. tag and push
-git tag -a v0.1.0 -m "BuildAI Serial Utility 0.1.0"
+git tag -a v0.1.0 -m "ComUtility 0.1.0"
 git push origin v0.1.0
 ```
 
-The `release` job then publishes a GitHub Release named "BuildAI Serial Utility x.y.z" with
-`BuildAI-SerialUtility-x.y.z-windows-x64-setup.exe`, `...-windows-x64.zip`,
+The `release` job then publishes a GitHub Release named "ComUtility x.y.z" with
+`ComUtility-x.y.z-windows-x64-setup.exe`, `...-windows-x64.zip`,
 `...-linux-x64.tar.gz` and `SHA256SUMS.txt`. A tag containing a hyphen (`v0.2.0-rc1`) is
 published as a pre-release.
 
@@ -281,14 +281,14 @@ published as a pre-release.
 
 ### Trying it without hardware (SIM: ports)
 
-By default the port list also contains four simulated devices (manufacturer "BuildAI Simulator"):
+By default the port list also contains four simulated devices (manufacturer "ComUtility Simulator"):
 
 | Port | What it does | Try |
 |---|---|---|
 | `SIM:loopback` | echoes every byte | hex view, logging, encodings, file send |
 | `SIM:linux` | Rockchip RV1106-style boot log, `login:` (any user / password), busybox-like shell with device-side line editing | `help`, `top -n 1`, `dmesg \| tail -n 50`, `color`, `chinese`, `wide`, `progress`, `stty size`, `reboot` (port vanishes 3 s, auto-reconnect), `poweroff` (device stays listed but is down until you reconnect), `exit` |
 | `SIM:uboot` | U-Boot banner + "Hit any key to stop autoboot" countdown, `=>` prompt, boots into the Linux simulation | press a key during the countdown, `printenv`, `setenv`, `bdinfo`, `mmc info`, `md 02008000`, `boot`, `reset` |
-| `SIM:mcu` | "BuildAI MCU shell" with `\r\n` lines and an AT command set | `help`, `led on`, `adc`, `telemetry on`, `AT`, `AT+GMR`, `ATE0`, `AT+RST` (device resets, port vanishes 1.5 s) |
+| `SIM:mcu` | "Demo MCU shell" with `\r\n` lines and an AT command set | `help`, `led on`, `adc`, `telemetry on`, `AT`, `AT+GMR`, `ATE0`, `AT+RST` (device resets, port vanishes 1.5 s) |
 
 Output is paced to the selected baud rate (pick 1500000 to see a boot log fly by, 300 to
 watch bytes trickle). Uncheck *Preferences > Connection > Show simulated devices* to hide
@@ -390,7 +390,7 @@ luckfox                     a Host alias from ~/.ssh/config (user, port, key and
   over a separate exec channel (`cat > file`, `cat file`, `wc -c`, `test -e`) and the dialog says
   "via shell". *Send File* still exists and pastes the file into the shell like on a serial port.
 - Session tabs are restored on the next start with their target selected, never auto-connected.
-  From the command line, `BuildAI-SerialUtility --ssh root@192.168.100.2` opens an SSH tab with
+  From the command line, `ComUtility --ssh root@192.168.100.2` opens an SSH tab with
   that target (add `--connect` to connect immediately).
 - *Preferences > SSH* holds the defaults used when a profile or ad-hoc target leaves a field
   empty: known_hosts file, identity file, terminal type and keep-alive interval.
@@ -547,7 +547,7 @@ updater) - and `~.`, which leaves the `rfmcu console` again. Their tooltips carr
 ### Command line (`su-fw`)
 
 `su-fw` (`su-fw.exe`) is the Firmware tab without a window, for a command shell, scripts and AI
-agents that update a board in the background. It is installed next to `BuildAI-SerialUtility` in
+agents that update a board in the background. It is installed next to `ComUtility` in
 every package (the same `bin/` folder, the same `tools/`) and runs the very same code as the tab
 (`FirmwareJob`): the same steps, tools, rules and messages. The log goes to stdout, the result is
 the exit code. It uses the app's settings - the SSH profiles and remembered passwords,
@@ -622,7 +622,7 @@ su-fw pull-flash --target builder@10.0.10.71 --password-env SU_PASSWORD --accept
 
 `pull-flash` always writes every partition, like the tab's Pull & Flash; for some partitions run
 `su-fw pull ...`, then `su-fw flash-soc --partitions boot,rootfs`. su-fw prints English only (its
-output is read by scripts); `QT_LOGGING_RULES="buildai.*=true"` adds the internal diagnostics on
+output is read by scripts); `QT_LOGGING_RULES="comutility.*=true"` adds the internal diagnostics on
 stderr.
 
 **Board profiles (v0.8.0).** su-fw knows two boards and tells them apart by evidence, never by
@@ -729,7 +729,7 @@ board's 8-10 MiB boot); the log prints the seconds per partition.
 #### The bench inventory (`su-fw inventory`, v0.8.0)
 
 Every su-fw command and the Firmware tab record what they learn about a board in one file,
-`inventory.json` in the app's data folder (Windows: `%LOCALAPPDATA%\BuildAI\SerialUtility`), keyed by
+`inventory.json` in the app's data folder (Windows: `%LOCALAPPDATA%\ComUtility\ComUtility`), keyed by
 the board's ADB serial. A record holds:
 
 - the board's profile, as detected from the board (never from `--profile`);
@@ -885,7 +885,7 @@ terminal renders colours and cursor movement, the hex view and an active session
 the bytes too. Raw captures are streamed byte for byte; a timestamped text capture (the
 default logging format) is recognised from its first line: the `[timestamp] ` prefixes and the
 `TX> ` lines (your own input) are removed and every line ends in CR LF again. *File > Stop
-Replay* aborts. From the command line: `BuildAI-SerialUtility.exe --replay boot.log --speed 1500000`
+Replay* aborts. From the command line: `ComUtility.exe --replay boot.log --speed 1500000`
 (`--speed 0` = as fast as possible). Replay only runs while the tab is disconnected - it never
 writes to the port, a request while a port is open is refused in the status bar, and connecting
 while a replay streams stops the replay first; while it streams, the tab is titled
@@ -999,7 +999,7 @@ su-fw (v0.6, console)  FirmwareCli ──► FirmwareJob (the same chain as the 
 
 CMake targets: `su_core` (static library: `src/app`, `src/core`, `src/ssh`, `src/firmware`,
 `src/terminal` minus the widget; UI-free, unit-tested), `su_app` (static library: every widget and
-dialog, linked by the GUI test suites), `SerialUtility` (`main.cpp` + `su_app` + resources) and
+dialog, linked by the GUI test suites), `ComUtility` (`main.cpp` + `su_app` + resources) and
 `su_fw` (the `su-fw` console program: `src/cli/main.cpp` + `su_core`), plus libssh built from
 source. Everything runs on the GUI thread except the SSH worker thread
 behind each `SshConnection`; `QSerialPort` is asynchronous, rendering is coalesced to 16 ms, and
@@ -1013,7 +1013,7 @@ thread).
 ## Project layout
 
 ```
-SerialUtility/
+ComUtility/
 ├── CMakeLists.txt, CMakePresets.json
 ├── scripts/            build.ps1, run.ps1, update-translations.ps1
 ├── src/
@@ -1046,9 +1046,17 @@ SerialUtility/
 └── docs/               DESIGN.md, TERMINAL_EMULATION.md, QUICKSTART.md, firmware-update/
 ```
 
-Settings are stored under organisation `BuildAI`, application `SerialUtility` (registry on
-Windows). Per-user data files (quick commands, history) live in
-`QStandardPaths::AppConfigLocation`.
+Settings are stored under the QSettings scope `ComUtility` / `ComUtility` (registry
+`HKCUSoftwareComUtilityComUtility` on Windows; the organisation name is internal, Qt needs a
+non-empty one, and it is shown nowhere). Per-user data files (quick commands, history, SSH profiles,
+inventory, firmware cache) live in `QStandardPaths::AppConfigLocation`
+(`%LOCALAPPDATA%ComUtilityComUtility`).
+
+**Upgrading from 0.8.0 or older.** Version 0.9.0 renamed the app to ComUtility, so it no longer
+reads the settings, data folder and saved SSH passwords of the earlier name. They are moved once per
+Windows user by a migration script that is kept outside this repository (it copies the registry tree
+and the data folder and re-encrypts the saved passwords; the old ones are left in place). Without it
+0.9.0 starts with default settings and asks for SSH passwords again.
 
 ## Troubleshooting
 
@@ -1092,7 +1100,7 @@ report (versions, compiler, OS, codecs).
 
 ## License
 
-Copyright 2026 BuildAI - all rights reserved.
+Copyright 2026 the ComUtility author - all rights reserved. Homepage: <https://moses-ai.us>.
 
 Qt is used under the terms of the GNU LGPL v3 (<https://www.qt.io/licensing>). libssh
 (<https://www.libssh.org>) is used as a shared library under the GNU LGPL v2.1; OpenSSL

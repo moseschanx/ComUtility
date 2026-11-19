@@ -501,8 +501,8 @@ private:
 void Tst_sshconnection::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-sshconnection"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-sshconnection"));
     QVERIFY(m_dir.isValid());
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_dir.filePath(QStringLiteral("settings")));

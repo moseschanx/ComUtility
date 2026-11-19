@@ -15,7 +15,7 @@ selection, update the MCU or set its role, Pull & Flash), log on stdout, exit co
 
 ## Shape
 
-1. **One console executable, `su-fw`** (`su-fw.exe`, installed next to `BuildAI-SerialUtility.exe`, same
+1. **One console executable, `su-fw`** (`su-fw.exe`, installed next to `ComUtility.exe`, same
    `tools/` folder). The GUI executable is a Windows-subsystem program and cannot write to the shell that
    started it, so the command line gets its own small `QCoreApplication` program that links `su_core` only
    (no widgets, no dialogs). Linux gets the same binary name in the tarball.

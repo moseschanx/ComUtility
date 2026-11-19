@@ -439,8 +439,8 @@ private:
 void Tst_sshsession::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-sshsession"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-sshsession"));
     QVERIFY(m_tempDir.isValid());
 
     // AppSettings / SecretStore / the transfer dialog use the default QSettings(): keep them out
@@ -449,14 +449,14 @@ void Tst_sshsession::initTestCase()
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("BuildAI-Test")));
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-sshsession")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtility-Test")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-sshsession")));
 
     // The window's profile store (and history / quick commands) go to the test-mode data
     // directory, never the real one.
-    QVERIFY2(SshProfileStore::defaultFilePath().contains(QStringLiteral("SerialUtilityTest-sshsession")),
+    QVERIFY2(SshProfileStore::defaultFilePath().contains(QStringLiteral("ComUtilityTest-sshsession")),
              qPrintable(SshProfileStore::defaultFilePath()));
-    QVERIFY(!AppSettings::dataDirectory().contains(QStringLiteral("/BuildAI/SerialUtility")));
+    QVERIFY(!AppSettings::dataDirectory().contains(QStringLiteral("/ComUtility/ComUtility")));
 
     // ~/.ssh/config must not change a connect (a developer's Host blocks); see SshWorker.
     qputenv("SU_SSH_IGNORE_CONFIG", "1");

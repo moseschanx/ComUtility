@@ -1,8 +1,8 @@
-# RV1106G2 Rev3 Stacked core (port/integration) versus the BG2 Node: facts for the BuildAI Serial Utility
+# RV1106G2 Rev3 Stacked core (port/integration) versus the BG2 Node: facts for ComUtility
 
-Written 2026-10-16 from read-only git reads of the blob-less clone `C:\Users\moses\code\BuildAI\rockchip-platforms`
+Written 2026-10-16 from read-only git reads of the blob-less clone of `rockchip-platforms`
 (branches `origin/port/integration` = INT, tip eea6c278 2026-10-16 20:44 +0800, and `origin/rv1106-bg2-main` = BG2,
-tip d6117e97 2026-10-17 00:57 +0800) and of the Serial Utility tree `C:\Users\moses\code\BuildAI\SerialUtility` (SU, v0.7.0).
+tip d6117e97 2026-10-17 00:57 +0800) and of this tree (SU, v0.7.0).
 Five readers' results were checked by a skeptic; this file keeps the confirmed, corrected and added facts and drops the six
 refuted ones. Nothing was built or run. **No fact about the stacked board has been exercised on hardware**: every behaviour
 commit on INT says so ("Not run on hardware." in d851fab2, 28f84c56, f15c0360, 81524abd, b4868151; "no board in hand" in
@@ -32,7 +32,7 @@ from confirmed lines, **I** = inference from code (no hardware), **NF** = not fo
 
 | # | Fact | Stacked (INT) | Node (BG2) | Evidence | St |
 |---|---|---|---|---|---|
-| 1 | SoC and RK_CHIP | RV1106G QFN-128 (G2 128 MB or G3 256 MB, not fixed in the schematic), `RK_CHIP=rv1106`, 32-bit ARM | RV1106B/RV1103B, `RK_CHIP=rv1103b` | `.mk:2` "# Build AI Rev3-Stacked core: RV1106G (G2 128 MB / G3 256 MB) + GC2083, 16 MB SPI NOR,"; `.mk:16` "export RK_CHIP=rv1106"; `.mk:13` "export RK_ARCH=arm"; `BG2.mk:9` "export RK_CHIP=rv1103b"; `PORT_REPORT.md:6` "(G2 or G3 not fixed in the schematic)" | C |
+| 1 | SoC and RK_CHIP | RV1106G QFN-128 (G2 128 MB or G3 256 MB, not fixed in the schematic), `RK_CHIP=rv1106`, 32-bit ARM | RV1106B/RV1103B, `RK_CHIP=rv1103b` | `.mk:2` "# Rev3-Stacked core: RV1106G (G2 128 MB / G3 256 MB) + GC2083, 16 MB SPI NOR,"; `.mk:16` "export RK_CHIP=rv1106"; `.mk:13` "export RK_ARCH=arm"; `BG2.mk:9` "export RK_CHIP=rv1103b"; `PORT_REPORT.md:6` "(G2 or G3 not fixed in the schematic)" | C |
 | 2 | SDK base and history | Rockchip RV1106/RV1103 Linux IPC SDK v1.9.0 (2026-04-30) imported verbatim as root a3e844cb (2026-10-10); 42 commits, 15 over `origin/rv1106g-stacked` | Vendor RV1106B SDK (rv1103b_linux_ipc_v1.2.1), separate 15-commit history rooted at e0e0d412 (2026-10-13); **no merge base** with INT | `PORT_REPORT.md:3-4` "Root commit `a3e844cb` = Rockchip RV1106/RV1103 Linux IPC SDK v1.9.0 (2026-04-30)"; `RK-RELEASE-NOTES-IPC.txt:3` "rv1106_ipc_linux_v1.9.0_20260430.xml"; `git merge-base origin/rv1106-bg2-main origin/port/integration` prints nothing; BG2 `README.md:6` "rv1103b_linux_ipc_v1.2.1" | C |
 | 3 | Toolchain, kernel | `arm-rockchip830-linux-uclibcgnueabihf`, kernel 5.10.226, ISP32 | `arm-rockchip831-...`, kernel 5.10.209, ISP33 | `.mk:19` "export RK_TOOLCHAIN_CROSS=arm-rockchip830-linux-uclibcgnueabihf"; `BG2.mk:12`; `fix-build-env.sh:20-21` "the kernel is 5.10.226 here (5.10.209 on RV1106B), newer." | C |
 | 4 | U-Boot | 2017.09 next-dev; `rv1106-spi-nor-tb_defconfig` + fragments `rk-sfc.config rv1106g-stacked-rockusb.config`; `CONFIG_ROCKCHIP_RV1106=y`; DEFAULT_DEVICE_TREE `rv1106-evb2`; 1.5 Mbaud debug UART at 0xff4c0000 | 2017.09; `rv1106b_defconfig` + `rk-sfc.config rv1106bg2-rockusb.config`; `CONFIG_ROCKCHIP_RV1103B=y` | `Makefile:5-6` "VERSION = 2017" / "PATCHLEVEL = 09"; `.mk:25` "export RK_UBOOT_DEFCONFIG=rv1106-spi-nor-tb_defconfig"; `.mk:29` "export RK_UBOOT_DEFCONFIG_FRAGMENT=\"rk-sfc.config rv1106g-stacked-rockusb.config\""; `defconfig:7,23,122-123`; `BG2.mk:21,25` | C |
@@ -115,7 +115,7 @@ from confirmed lines, **I** = inference from code (no hardware), **NF** = not fo
 
 ---
 
-## 2. What this means for the BuildAI Serial Utility (v0.7.0)
+## 2. What this means for the ComUtility (v0.7.0)
 
 What the tool knows today (SU paths): the Loader is "0x110e on the RV1106 in Loader mode" (`src/firmware/UsbProbe.h:52-53`), download mode is any 0x2207 device that is not the ADB gadget (`UsbProbe.h:55` `isDownloadMode() { return vid == 0x2207 && pid != 0x0006; }`), the flash layout is the image's env.img or the board's `/proc/cmdline` remembered per serial (`src/firmware/FirmwareJob.cpp:980,1044-1069`, `src/app/AppSettings.h:169`), the image's chip tag is parsed from `SFI` and only displayed (`src/firmware/RockchipTool.h:64,72`), Loader mode writes `EXF` + `WL <offset/512> <size/512>` per partition + `RD` with no chip check and MASKROM mode writes the whole image with `UF` (`src/firmware/SocFlasher.h:59-62`, `RockchipTool.cpp:201-298`), protected partitions are idblock/uboot/env/meta (`src/firmware/FleetFlasher.cpp:343`), and a board's USB port is learned by the bus-address suffix of its instance id because the Node's gadget shows no USB serial string (`UsbProbe.h:21-26`, `UsbProbe.cpp:38-46`).
 

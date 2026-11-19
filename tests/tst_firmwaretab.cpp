@@ -388,17 +388,17 @@ private:
 void Tst_firmwaretab::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
     // (v0.8.0) The pid in the name: the test-mode data folder (firmware.lock, inventory.json) is this
     // run's own, so two runs of the suite at once (two build folders) never meet on the lock.
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-firmwaretab-%1").arg(QCoreApplication::applicationPid()));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-firmwaretab-%1").arg(QCoreApplication::applicationPid()));
     QVERIFY(m_tempDir.isValid());
 
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-firmwaretab")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-firmwaretab")));
 
     // "78,040 bytes" whatever the machine's locale is.
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
@@ -898,12 +898,12 @@ void Tst_firmwaretab::appendLogTimestamps()
     QSignalSpy added(tab.get(), &FirmwareTab::logLineAdded);
     const QRegularExpression stamped(QStringLiteral("^\\d\\d:\\d\\d:\\d\\d hello firmware$"));
 
-    // Mirrored into the System Log through the "buildai.firmware" category.
+    // Mirrored into the System Log through the "comutility.firmware" category.
     static QStringList s_mirrored;
     s_mirrored.clear();
     const QtMessageHandler previous = qInstallMessageHandler(
         [](QtMsgType, const QMessageLogContext& context, const QString& message) {
-            if (context.category && qstrcmp(context.category, "buildai.firmware") == 0) {
+            if (context.category && qstrcmp(context.category, "comutility.firmware") == 0) {
                 s_mirrored.append(message);
             }
         });

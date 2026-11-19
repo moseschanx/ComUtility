@@ -231,7 +231,7 @@ public:
     static QStringList commandOptions(const QString& command);
     /// `su-fw --help` (empty `command`) or `su-fw <command> --help`.
     static QString helpText(const QString& command = QString());
-    static QString versionText();                             ///< "su-fw 0.6.0 (BuildAI Serial Utility, <git hash>)"
+    static QString versionText();                             ///< "su-fw 0.6.0 (ComUtility, <git hash>)"
 
 public slots:
     /// Ctrl+C / SIGINT: cancels the running operation (see the class comment); remembered while the

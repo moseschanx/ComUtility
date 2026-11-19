@@ -226,15 +226,15 @@ void Tst_terminalperf::initTestCase()
 {
     QVERIFY(s_fontDirConfigured);
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-perf"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-perf"));
     QVERIFY(m_tempDir.isValid());
     // Keep AppSettings out of the registry and inside the temporary directory.
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-perf")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-perf")));
 
     AppSettings& app = AppSettings::instance();
     app.setLogDirectory(m_tempDir.filePath(QStringLiteral("logs")));

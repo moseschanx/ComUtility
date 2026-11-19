@@ -79,7 +79,7 @@ bool SessionLogger::start(const QString& filePath, Format format, bool includeTx
             }
         }
 
-        QString line = QStringLiteral("# BuildAI Serial Utility log");
+        QString line = QStringLiteral("# ComUtility log");
         if (!header.trimmed().isEmpty()) {
             line += QStringLiteral(" - ") + header.trimmed();
         }

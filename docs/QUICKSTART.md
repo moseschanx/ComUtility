@@ -1,17 +1,17 @@
-# BuildAI Serial Utility - Quick Start
+# ComUtility - Quick Start
 
 One page to get from a fresh checkout to a Rockchip boot log. Details: [`../README.md`](../README.md).
 
 ## 1. Build (Windows, 2 minutes)
 
 ```powershell
-git clone <repo-url> SerialUtility
-cd SerialUtility
+git clone <repo-url> ComUtility
+cd ComUtility
 .\scripts\build.ps1 -Config Release -Test      # needs Qt 6.8.3 MSVC2022 at D:\Qt (or set QT_ROOT)
 .\scripts\run.ps1   -Config Release
 ```
 
-Linux: install Qt >= 6.8 first (see README "Plain CMake (Linux)": Debian 13 / Ubuntu 25.10+ apt packages incl. `qt6-l10n-tools`, or aqtinstall 6.8.3 gcc_64 + `-DCMAKE_PREFIX_PATH`), then `cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build && ./build/BuildAI-SerialUtility`
+Linux: install Qt >= 6.8 first (see README "Plain CMake (Linux)": Debian 13 / Ubuntu 25.10+ apt packages incl. `qt6-l10n-tools`, or aqtinstall 6.8.3 gcc_64 + `-DCMAKE_PREFIX_PATH`), then `cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build && ./build/ComUtility`
 
 Qt Creator: open `CMakeLists.txt`, pick the `Release` preset, press Run.
 
@@ -115,12 +115,12 @@ the CC1310 commands (`help`, `version`, `sys`, `stack`, `uart`, `power`, `bat`, 
 
 | Item | Location |
 |---|---|
-| Settings | Registry (Windows) / `~/.config/BuildAI/SerialUtility.conf` (Linux) |
+| Settings | Registry (Windows) / `~/.config/ComUtility/ComUtility.conf` (Linux) |
 | Quick commands, history, SSH profiles | `QStandardPaths::AppConfigLocation` -> `quick_commands.json`, `history.txt`, `ssh_profiles.json` (no secrets; saved passwords go to DPAPI-protected settings) |
 | Pulled firmware images | the Firmware tab's *Local cache* folder (default `<data dir>/firmware`: `update.img`, the previous `update.prev.img` and their `.json` notes) |
 | Flashing tools | `tools\` next to the executable (`upgrade_tool.exe`, `adb.exe`, `DriverAssistant\`); other copies via *Preferences > Firmware* |
 | SSH host keys | `~/.ssh/known_hosts`, shared with the `ssh` command |
-| Logs | `<Documents>/BuildAI/SerialLogs/<port>_<date>.log` (change in Preferences > Logging) |
+| Logs | `<Documents>/ComUtility/SerialLogs/<port>_<date>.log` (change in Preferences > Logging) |
 | Deployed app | `dist\Release\bin` after `build.ps1 -Deploy` |
 
 ## 8. Shortcuts

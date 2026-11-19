@@ -8,7 +8,7 @@
 namespace {
 
 const QString kHeader = QStringLiteral("COM8 115200 8N1");
-const QByteArray kHeaderPrefix = QByteArrayLiteral("# BuildAI Serial Utility log - COM8 115200 8N1 - started ");
+const QByteArray kHeaderPrefix = QByteArrayLiteral("# ComUtility log - COM8 115200 8N1 - started ");
 
 } // namespace
 
@@ -71,7 +71,7 @@ void Tst_sessionlogger::headerOnFreshLineAfterUnterminatedTail()
     const QByteArray content = readFile(path);
     QVERIFY2(content.startsWith(QByteArrayLiteral("abc\n") + kHeaderPrefix), content.constData());
     QVERIFY(content.endsWith('\n'));
-    QCOMPARE(content.count(QByteArrayLiteral("BuildAI")), qsizetype(1));
+    QCOMPARE(content.count(QByteArrayLiteral("ComUtility")), qsizetype(1));
 }
 
 void Tst_sessionlogger::headerWithoutBlankLineAfterTerminatedTail()

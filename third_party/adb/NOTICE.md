@@ -7,7 +7,7 @@
 | Origin | Rockchip FactoryTool v1.91 (`FactoryTool_v1.91/bin/`, taken from `tools/windows/FactoryTool_v1.91.zip` of the `rockchip-platforms` repository, commit e0e0d41) |
 | Licence | Apache License, Version 2.0 (Android Open Source Project, <https://www.apache.org/licenses/LICENSE-2.0>) |
 
-BuildAI Serial Utility starts this `adb.exe` as a separate process (it is never linked into the
+ComUtility starts this `adb.exe` as a separate process (it is never linked into the
 application) to reach the RV1106 SoC of the Node board over USB: `adb shell`, `adb pull`, and
 `adb forward tcp:0 ...` for the SSH path through USB. The binary is Rockchip's build of the AOSP
 sources; it is redistributed unmodified, exactly as shipped in FactoryTool v1.91. It supports

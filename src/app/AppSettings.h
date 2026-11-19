@@ -216,8 +216,8 @@ public:
     /// Font used when terminal/font is absent: "Consolas" 10pt on Windows, "Monospace" 10pt
     /// elsewhere (style hint Monospace, fixed pitch).
     static QFont defaultTerminalFont();
-    /// Directory used when logging/directory is absent: <Documents>/BuildAI/SerialLogs, or
-    /// <home>/BuildAI/SerialLogs when QStandardPaths reports no Documents location. Forward slashes.
+    /// Directory used when logging/directory is absent: <Documents>/ComUtility/SerialLogs, or
+    /// <home>/ComUtility/SerialLogs when QStandardPaths reports no Documents location. Forward slashes.
     static QString defaultLogDirectory();
 
     void sync();

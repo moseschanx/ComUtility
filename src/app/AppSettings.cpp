@@ -141,7 +141,7 @@ QString AppSettings::defaultLogDirectory()
     if (docs.isEmpty()) {
         docs = QDir::homePath();
     }
-    return docs + QStringLiteral("/BuildAI/SerialLogs");
+    return docs + QStringLiteral("/ComUtility/SerialLogs");
 }
 
 // Writes `value` under `key` and emits changed(key).
@@ -521,7 +521,7 @@ QString AppSettings::dataDirectory()
         dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     }
     if (dir.isEmpty()) {
-        dir = QDir::homePath() + QStringLiteral("/.BuildAI/SerialUtility");
+        dir = QDir::homePath() + QStringLiteral("/.ComUtility");
     }
     if (!QDir(dir).exists() && !QDir().mkpath(dir)) {
         qCWarning(lcApp) << "cannot create data directory" << QDir::toNativeSeparators(dir);

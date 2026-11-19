@@ -45,7 +45,7 @@ constexpr int kCleanupExecTimeoutMs = 10 * 1000; ///< the `rm -f` of a broken up
 constexpr int kExecExitTimeoutMs = 30 * 1000;    ///< exit status after EOF of a data command
 constexpr int kExecPollMs = 50;                  ///< read slice of a synchronous helper command
 constexpr qsizetype kExecStderrCap = 8 * 1024;   ///< stderr text kept per exec channel
-const char kKeepAlivePayload[] = "keepalive@buildai";
+const char kKeepAlivePayload[] = "keepalive@comutility";
 
 // The free helpers below translate through QCoreApplication::translate() with an explicit
 // context: a context-less tr() in a free function is invisible to lupdate. Member functions of

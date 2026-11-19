@@ -61,7 +61,7 @@
  *    mmc info, mmc list, md <addr>, reset (banner again -> countdown), boot / run bootcmd
  *    (prints "## Booting kernel ..." then switches to Linux behaviour: boot log + login).
  *    If not interrupted, the countdown reaches 0 and boots automatically.
- *  - Mcu ("SIM:mcu"): "BuildAI MCU shell v1.0 (STM32F4 @168MHz)" banner, prompt "> ",
+ *  - Mcu ("SIM:mcu"): "Demo MCU shell v1.0 (STM32F4 @168MHz)" banner, prompt "> ",
  *    echo of typed characters, lines end with "\r\n". Commands: help, version, reset
  *    (banner again), led on|off|toggle, adc (8 channel readings), temp, uptime,
  *    telemetry on|off [ms] (every 2 s - or every `ms` ms, 100..60000 - prints
@@ -113,7 +113,7 @@ public:
     static std::optional<Kind> kindFromPortName(const QString& portName);
     static QString portName(Kind kind);                       ///< "SIM:loopback" | "SIM:linux" | "SIM:uboot" | "SIM:mcu"
     static QString description(Kind kind);                    ///< translated, e.g. "Simulated Rockchip Linux console"
-    static QList<SerialPortEntry> entries();                  ///< all kinds, manufacturer "BuildAI Simulator", in the order above
+    static QList<SerialPortEntry> entries();                  ///< all kinds, manufacturer "ComUtility Simulator", in the order above
     static bool isPresent(const QString& portName);           ///< false while "rebooting" (see vanished())
     /// false only during a timed reboot; a powered-off device (forMs < 0) stays listed so the
     /// user can reopen it (which powers it on)

@@ -88,7 +88,7 @@ QString sfiSample(const QString& eol, const QString& sep)
 {
     QStringList lines;
     lines << QStringLiteral("rockusb driver = 5.12,please upgrade it to enjoy fast download") << QString()
-          << QStringLiteral("File:C:\\Users\\moses\\code\\BuildAI\\SerialUtility\\build\\update.img") << QString()
+          << QStringLiteral("File:C:\\Users\\moses\\code\\ComUtility\\build\\update.img") << QString()
           << QStringLiteral("Type:Update Firmware") << QString()
           << QStringLiteral("Chip Tag:110E%1Version:0.0.00%1Build Time:2026-10-13 21:45:50%1Sign:false").arg(sep)
           << QString()
@@ -1509,7 +1509,7 @@ void tst_firmwaretools::rockchip_firmwareInfoNineEntries()
     for (const QString& eol : {QStringLiteral("\r\n"), QStringLiteral("\n")}) {
         const RkFirmwareInfo info = RockchipTool::parseFirmwareInfo(sfiSample(eol, QStringLiteral("\t")));
         QVERIFY(info.isValid());
-        QCOMPARE(info.file, QStringLiteral("C:\\Users\\moses\\code\\BuildAI\\SerialUtility\\build\\update.img"));
+        QCOMPARE(info.file, QStringLiteral("C:\\Users\\moses\\code\\ComUtility\\build\\update.img"));
         QCOMPARE(info.type, QStringLiteral("Update Firmware"));
         QCOMPARE(info.chipTag, QStringLiteral("110E"));
         QCOMPARE(info.version, QStringLiteral("0.0.00"));

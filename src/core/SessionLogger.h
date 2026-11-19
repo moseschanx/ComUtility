@@ -18,7 +18,7 @@
  *  - HexDump: every chunk becomes "[timestamp] RX/TX (N bytes)\n" + HexUtils::hexDump(chunk) + "\n".
  *
  * File is opened in append mode; for Text/HexDump formats a header line
- * "# BuildAI Serial Utility log - <port> <settings> - started <time>" is written on start, preceded
+ * "# ComUtility log - <port> <settings> - started <time>" is written on start, preceded
  * by '\n' when the existing file does not already end in one, so the header always begins a new
  * line (Raw captures stay a verbatim byte stream). Data is flushed after every write (logs must
  * survive a crash of the board or the app); a failed write or flush stops the log and emits error().

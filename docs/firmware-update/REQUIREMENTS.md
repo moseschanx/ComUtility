@@ -2,7 +2,7 @@
 
 All paths in this file are relative to the repository root unless they name another repository.
 
-Add a **Firmware** tab to BuildAI Serial Utility (currently 0.4.0) that
+Add a **Firmware** tab to ComUtility (currently 0.4.0) that
 replaces our whole Windows flashing routine for the Node board (Rockchip RV1106BG2 SoC + TI CC1310 RF MCU):
 pull the latest build from the Linux build machine, flash the SoC, update the MCU, all over the board's single
 USB-C cable, with no vendor GUI (RKDevTool / SocToolKit / FactoryTool), no USB-serial adapter and no MASKROM
@@ -15,10 +15,10 @@ recursive, overwrite or skip same-size files, progress, cancel; nothing else) to
 adapter into the CC1310 and run `fw_update.py`. We want one tab and, for the common case, one button:
 **Pull & Flash**.
 
-## Read first (SerialUtility)
+## Read first (ComUtility)
 - docs/DESIGN.md (architecture, module contracts, UX rules: never block the GUI thread, status-bar errors,
   `tr()` on UI text, keyboard shortcuts, tests offscreen; §4.8 SSH), README.md, VERSION.txt, CMakeLists.txt,
-  .github/workflows/build.yml, packaging/windows/BuildAI-SerialUtility.iss.
+  .github/workflows/build.yml, packaging/windows/ComUtility.iss.
 - src/ui/MainWindow.{h,cpp}: the QTabWidget holds only SessionWidgets, and `currentSession()` / `sessionAt()` /
   tab restore assume that. A non-session tab must not break those paths (null checks, session actions disabled
   while it is current, not saved/restored as a port).
@@ -28,7 +28,7 @@ adapter into the CC1310 and run `fw_update.py`. We want one tab and, for the com
 
 ## Read first (the other two repos; clone them next to this one, e.g. `../rockchip-platforms` and `../CC1310-Firmware`;
 ## rockchip-platforms is internal: if `gh` cannot see it, ask me)
-- build-ai-ego/rockchip-platforms, branch `rv1106-bg2-main` (tag v1.3.0 and later): README.md,
+- the Rockchip platform repository (rockchip-platforms), branch `rv1106-bg2-main` (tag v1.3.0 and later): README.md,
   `tools/usb_update.sh` (the Linux reference of the SoC flow below, port its logic), `project/app/rfmcu/README.md`
   and `rfmcu.c` (the on-board MCU bridge). Windows binaries, Git LFS: `tools/windows/SocToolKit/bin/windows/`
   (`upgrade_tool.exe`, a native Win32 console tool, v2.37; `license.txt` one level up),

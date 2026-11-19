@@ -53,7 +53,7 @@ quint32 nextNoise(quint32& state)
 }
 
 const QLatin1String kPrefix("SIM:");
-const QLatin1String kManufacturer("BuildAI Simulator");
+const QLatin1String kManufacturer("ComUtility Simulator");
 const QLatin1String kHostName("rv1106");
 
 // ---- presence table ---------------------------------------------------------------------
@@ -101,7 +101,7 @@ const char* const kUBootBanner[] = {
 
 const char* const kKernelBoot[] = {
     "[    0.000000] Booting Linux on physical CPU 0x0",
-    "[    0.000000] Linux version 5.10.160 (buildai@ci) (arm-rockchip830-linux-uclibcgnueabihf-gcc (crosstool-NG "
+    "[    0.000000] Linux version 5.10.160 (builder@ci) (arm-rockchip830-linux-uclibcgnueabihf-gcc (crosstool-NG "
     "1.24.0) 8.3.0, GNU ld (crosstool-NG 1.24.0) 2.32) #1 PREEMPT Wed Sep 17 10:21:43 CST 2026",
     "[    0.000000] CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=10c5387d",
     "[    0.000000] CPU: div instructions available: patching division code",
@@ -183,9 +183,9 @@ const char* const kInitLines[] = {
     "Starting rkipc: [  \x1b[32mOK\x1b[0m  ]",
     "Starting sshd: [\x1b[31mFAILED\x1b[0m] (no host keys, run ssh-keygen -A)",
     "Starting dropbear sshd: [  \x1b[32mOK\x1b[0m  ]",
-    "Starting BuildAI agent: [  \x1b[32mOK\x1b[0m  ]",
+    "Starting board agent: [  \x1b[32mOK\x1b[0m  ]",
     // UTF-8 source, compiled with /utf-8 (MSVC) or the GCC/Clang default execution charset.
-    "本机信息：瑞芯微 RV1106 开发板，内核 5.10.160，欢迎使用 BuildAI Linux",
+    "本机信息：瑞芯微 RV1106 开发板，内核 5.10.160，欢迎使用 Rockchip Linux",
 };
 
 const char* const kCpuInfo[] = {
@@ -256,14 +256,14 @@ const char* const kPsLines[] = {
     "  144 root      1892 S    /sbin/klogd -n",
     "  180 root      2156 S    /usr/sbin/dropbear -R -B",
     "  201 root     18432 S    /oem/usr/bin/rkipc -a /oem/usr/share/iqfiles",
-    "  214 root      2244 S    /usr/bin/buildai-agent --uart /dev/ttyS2",
+    "  214 root      2244 S    /usr/bin/board-agent --uart /dev/ttyS2",
     "  230 root      1972 S    -sh",
     "  241 root      1968 R    ps",
 };
 
 const char* const kTopRows[] = {
     "  201     1 root     S    18432  29%   3% /oem/usr/bin/rkipc -a /oem/usr/share/iqfiles",
-    "  214     1 root     S     2244   4%   1% /usr/bin/buildai-agent --uart /dev/ttyS2",
+    "  214     1 root     S     2244   4%   1% /usr/bin/board-agent --uart /dev/ttyS2",
     "  242   230 root     R     1972   3%   1% top -n 1",
     "  180     1 root     S     2156   3%   0% /usr/sbin/dropbear -R -B",
     "  230     1 root     S     1972   3%   0% -sh",
@@ -399,7 +399,7 @@ const char* const kMcuHelp[] = {
     "  AT, AT+GMR, ATE0/1, AT+RST",
 };
 
-const QLatin1String kMcuVersion("BuildAI MCU shell v1.0 (STM32F4 @168MHz)");
+const QLatin1String kMcuVersion("Demo MCU shell v1.0 (STM32F4 @168MHz)");
 const QLatin1String kUBootVersion("U-Boot 2017.09-g9c9ea3b6-dirty (Sep 17 2026 - 10:21:43 +0800)");
 
 /// Directory listing of the fake root file system ("" = empty directory).
@@ -416,7 +416,7 @@ const struct
              "mmcblk0p6 mmcblk0p7 null ptmx pts random rkipc rtc0 shm stderr stdin stdout tty ttyFIQ0 ttyS0 ttyS1 "
              "ttyS2 urandom video0 video1 video11 watchdog zero"},
     {"/etc", "fstab group hostname hosts init.d inittab passwd profile resolv.conf shadow ssl"},
-    {"/etc/init.d", "S01syslogd S02klogd S02sysctl S40network S50dropbear S60rkipc S99buildai"},
+    {"/etc/init.d", "S01syslogd S02klogd S02sysctl S40network S50dropbear S60rkipc S99boardagent"},
     {"/lib", "ld-uClibc.so.1 libc.so.1 libm.so.1 libpthread.so.1 modules"},
     {"/media", ""},
     {"/mnt", ""},
@@ -435,7 +435,7 @@ const struct
     {"/userdata/logs", "agent.log rkipc.log"},
     {"/userdata/recording", ""},
     {"/usr", "bin lib sbin share"},
-    {"/usr/bin", "buildai-agent dropbearkey free killall top uptime"},
+    {"/usr/bin", "board-agent dropbearkey free killall top uptime"},
     {"/usr/sbin", "dropbear"},
     {"/var", "lock log run tmp"},
 };
@@ -465,7 +465,7 @@ const struct
     {"/etc/resolv.conf", "nameserver 192.168.1.1\nnameserver 8.8.8.8\n"},
     {"/proc/cmdline", "earlycon=uart8250,mmio32,0xff4c0000 console=ttyFIQ0 root=/dev/mmcblk0p5 rootfstype=squashfs "
                       "rootwait snd_aloop.index=7\n"},
-    {"/proc/version", "Linux version 5.10.160 (buildai@ci) (arm-rockchip830-linux-uclibcgnueabihf-gcc (crosstool-NG "
+    {"/proc/version", "Linux version 5.10.160 (builder@ci) (arm-rockchip830-linux-uclibcgnueabihf-gcc (crosstool-NG "
                       "1.24.0) 8.3.0, GNU ld (crosstool-NG 1.24.0) 2.32) #1 PREEMPT Wed Sep 17 10:21:43 CST 2026\n"},
     {"/proc/mounts", "/dev/root / squashfs ro,relatime 0 0\nproc /proc proc rw,relatime 0 0\n"
                      "devtmpfs /dev devtmpfs rw,relatime,size=31324k,nr_inodes=7831,mode=755 0 0\n"
@@ -1282,7 +1282,7 @@ void DeviceSimulator::handleLine(const QString& line)
     case Stage::Password:
         m_stage = Stage::Shell;
         m_cwd = QStringLiteral("/root");
-        emitLine(QStringLiteral("Welcome to BuildAI Linux (%1), kernel 5.10.160").arg(kHostName));
+        emitLine(QStringLiteral("Welcome to Rockchip Linux (%1), kernel 5.10.160").arg(kHostName));
         emitLine(QStringLiteral("Last login: %1 on ttyFIQ0")
                      .arg(QLocale::c().toString(QDateTime::currentDateTime(),
                                                 QStringLiteral("ddd MMM d HH:mm:ss yyyy"))));
@@ -1407,7 +1407,7 @@ void DeviceSimulator::showLogin()
     m_lineBuffer.clear();
     m_utf8Pending.clear();
     m_user.clear();
-    emitLine(QStringLiteral("BuildAI Linux 5.10.160 %1 ttyFIQ0").arg(kHostName));
+    emitLine(QStringLiteral("Rockchip Linux 5.10.160 %1 ttyFIQ0").arg(kHostName));
     emitLine(QString());
     emitText(QStringLiteral("%1 login: ").arg(kHostName));
 }
@@ -1669,7 +1669,7 @@ bool DeviceSimulator::runShellTextCommand(const QString& cmd, const QStringList&
     }
     if (cmd == QLatin1String("chinese")) {
         // Source file is UTF-8 and compiled with /utf-8 (MSVC) or the GCC/Clang default.
-        out << QString::fromUtf8("欢迎使用 BuildAI 串口工具")
+        out << QString::fromUtf8("欢迎使用 ComUtility 串口工具")
             << QString::fromUtf8("系统启动完成，登录成功。")
             << QString::fromUtf8("当前设备：Luckfox Pico RV1106（Rockchip）")
             << QString::fromUtf8("温度：40°C，内存：62896 kB，存储：7.4 GiB")
@@ -1819,7 +1819,7 @@ void DeviceSimulator::handleShellCommand(const QString& line)
     if (cmd == QLatin1String("reboot")) {
         emitLine(QString());
         emitLine(QStringLiteral("The system is going down for reboot NOW!"));
-        emitLine(QStringLiteral("Stopping BuildAI agent: OK"));
+        emitLine(QStringLiteral("Stopping board agent: OK"));
         emitLine(QStringLiteral("Stopping rkipc: OK"));
         emitLine(QStringLiteral("Stopping network: OK"));
         emitLine(QStringLiteral("Unmounting file systems: OK"));
@@ -2169,7 +2169,7 @@ void DeviceSimulator::handleMcuCommand(const QString& line)
             emitLine(QStringLiteral("OK"));
         } else if (upper == QLatin1String("AT+GMR")) {
             emitLine(kMcuVersion);
-            emitLine(QStringLiteral("SDK version: v1.0.0-buildai"));
+            emitLine(QStringLiteral("SDK version: v1.0.0-sim"));
             emitLine(QStringLiteral("compile time: Sep 17 2026 10:21:43"));
             emitLine(QStringLiteral("OK"));
         } else if (upper == QLatin1String("ATE0")) {

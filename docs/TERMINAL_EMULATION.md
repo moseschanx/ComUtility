@@ -4,7 +4,7 @@
 `TerminalWidget` sends for each key. Target: the VT100/xterm subset used by U-Boot, the Linux
 console, busybox/ash line editing, ncurses programs (`top`, `vi`, `menuconfig`) and MCU shells.
 Not a terminfo-complete xterm; unknown input is consumed silently (logged at debug level on the
-`buildai.terminal` category) and **never desynchronises** the output.
+`comutility.terminal` category) and **never desynchronises** the output.
 
 The parser is Paul Williams' VT500-series state machine (<https://vt100.net/emu/dec_ansi_parser>)
 with two deliberate extensions: colon sub-parameters in CSI (for `SGR 38:2::r:g:b`), and any

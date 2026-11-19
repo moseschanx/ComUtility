@@ -85,14 +85,14 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName(QStringLiteral(APP_NAME));
     // Deliberately no setApplicationDisplayName(): the Windows platform plugin appends the
     // display name to every window title that does not end with it, which turned the
-    // MainWindow title "BuildAI Serial Utility 0.1.0 - COM8" into
-    // "... - BuildAI Serial Utility". MainWindow::updateWindowTitle() owns the title format.
+    // MainWindow title "ComUtility 0.1.0 - COM8" into
+    // "... - ComUtility". MainWindow::updateWindowTitle() owns the title format.
     QCoreApplication::setApplicationVersion(QStringLiteral(APP_VERSION));
-    QGuiApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/buildai.png")));
+    QGuiApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/comutility.png")));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        QStringLiteral("BuildAI Serial Utility - serial-port terminal for Rockchip Linux boards and MCU shells"));
+        QStringLiteral("ComUtility - serial-port terminal for Rockchip Linux boards and MCU shells"));
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addPositionalArgument(QStringLiteral("port"),
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 
     MainWindow window;
 
-    qCInfo(lcApp) << "BuildAI Serial Utility" << APP_VERSION << APP_GIT_HASH << "Qt" << qVersion();
+    qCInfo(lcApp) << "ComUtility" << APP_VERSION << APP_GIT_HASH << "Qt" << qVersion();
 
     if (!portArg.isEmpty()) {
         SessionWidget* session = selectPortSession(window, portArg);

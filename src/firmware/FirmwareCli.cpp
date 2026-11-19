@@ -189,7 +189,7 @@ const char* const kExitCodesHelp = R"HELP(Exit codes:
      back to ADB, a board being written finishes all its partitions and its reset first.
 )HELP";
 
-const char* const kGlobalHelp = R"HELP(su-fw - flash the BuildAI Node and Stacked boards (RV1106 SoC + CC1310 RF MCU) from a command shell
+const char* const kGlobalHelp = R"HELP(su-fw - flash the Node and Stacked boards (RV1106 SoC + CC1310 RF MCU) from a command shell
 
 Usage:
   su-fw <command> [options]
@@ -2984,5 +2984,5 @@ QString FirmwareCli::helpText(const QString& command)
 
 QString FirmwareCli::versionText()
 {
-    return QStringLiteral("su-fw %1 (BuildAI Serial Utility, %2)").arg(QStringLiteral(APP_VERSION), QStringLiteral(APP_GIT_HASH));
+    return QStringLiteral("su-fw %1 (ComUtility, %2)").arg(QStringLiteral(APP_VERSION), QStringLiteral(APP_GIT_HASH));
 }

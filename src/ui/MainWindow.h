@@ -127,7 +127,7 @@ class FirmwareTab;
  *    (embedded :/translations/qtbase_<code>.qm, falling back to qtbase_/qt_<code> in
  *    QLibraryInfo::path(TranslationsPath)); LanguageChange event -> ui->retranslateUi(this) +
  *    retranslateStatusBar(); child widgets handle their own changeEvent.
- *  - The window title is "BuildAI Serial Utility <version>" plus " - <displayName>" of the
+ *  - The window title is "ComUtility <version>" plus " - <displayName>" of the
  *    active tab (the port, or the SSH profile name / user@host:port).
  *  - Firmware tab (v0.5, ui/FirmwareTab.h): the QTabWidget may hold one non-session tab.
  *    currentSession() / sessionAt() return null for it (qobject_cast), so every session action

@@ -34,15 +34,15 @@ private:
 void Tst_secretstore::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-secretstore"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-secretstore"));
     QVERIFY(m_dir.isValid());
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_dir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
     QVERIFY(settings.fileName().startsWith(m_dir.path()));
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-secretstore")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-secretstore")));
 }
 
 void Tst_secretstore::init()

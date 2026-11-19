@@ -22,7 +22,7 @@ struct ChunkCollector
 };
 
 const QByteArray kTextCapture = QByteArrayLiteral(
-    "# BuildAI Serial Utility log - COM8 115200 8N1 - started 2026-09-20T10:00:00\n"
+    "# ComUtility log - COM8 115200 8N1 - started 2026-09-20T10:00:00\n"
     "[2026-09-20 10:00:00.000] U-Boot 2017.09\r\n"
     "[2026-09-20 10:00:00.010] TX> printenv\n"
     "[2026-09-20 10:00:00.020] bootcmd=boot_fit\n"
@@ -91,6 +91,9 @@ void Tst_logreplayer::detectFormat_data()
     QTest::addColumn<bool>("timestamped");
     QTest::newRow("timestamp first") << QByteArrayLiteral("[2026-09-20 10:00:00.000] hello\n") << true;
     QTest::newRow("header first") << kTextCapture << true;
+    // A capture written before the rename carries the earlier app name in its header: still ours.
+    QTest::newRow("header of an earlier name") << QByteArrayLiteral("# Serial Terminal log - COM3 115200 8N1 - started 2026-09-20T10:00:00\nU-Boot\n") << true;
+    QTest::newRow("header without settings") << QByteArrayLiteral("# ComUtility log - started 2026-09-20T10:00:00\nU-Boot\n") << true;
     QTest::newRow("leading blank lines") << QByteArrayLiteral("\r\n\r\n[2026-09-20 10:00:00.000] x") << true;
     QTest::newRow("no trailing newline") << QByteArrayLiteral("[2026-09-20 10:00:00.000] x") << true;
     QTest::newRow("uboot banner") << QByteArrayLiteral("U-Boot 2017.09\r\n") << false;
@@ -363,7 +366,7 @@ void Tst_logreplayer::timestampedReplay()
     QTRY_COMPARE_WITH_TIMEOUT(finished.count(), 1, 2000);
     QCOMPARE(collected.data, kStripped);
     QVERIFY(!collected.data.contains("TX>"));
-    QVERIFY(!collected.data.contains("# BuildAI"));
+    QVERIFY(!collected.data.contains("# ComUtility"));
 }
 
 void Tst_logreplayer::rawFormatCanBeForced()

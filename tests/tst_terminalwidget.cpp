@@ -393,10 +393,10 @@ void Tst_terminalwidget::initTestCase()
     // AppSettings uses the default QSettings() constructor, which picks these names up. INI
     // format keeps the test settings in the test-mode config directory instead of the registry.
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-terminalwidget"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-terminalwidget"));
     QSettings settings;
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-terminalwidget")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-terminalwidget")));
     settings.clear();
     settings.sync();
     QVERIFY(m_tempDir.isValid());

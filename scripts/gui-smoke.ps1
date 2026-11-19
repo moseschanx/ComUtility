@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    End-to-end smoke driver: runs the real (deployed) BuildAI-SerialUtility.exe on the desktop,
+    End-to-end smoke driver: runs the real (deployed) ComUtility.exe on the desktop,
     drives it with keystrokes (SendKeys) and captures screenshots for visual inspection.
 
 .DESCRIPTION
@@ -41,7 +41,7 @@
 #>
 param(
     [Parameter(Mandatory = $true)][ValidateSet('linux', 'uboot', 'mcu', 'menus', 'hardware', 'stress', 'markmode', 'ssh', 'sshfiles', 'firmware')][string]$Scenario,
-    [string]$Exe = '',      # default: <repo>\dist\Release\bin\BuildAI-SerialUtility.exe
+    [string]$Exe = '',      # default: <repo>\dist\Release\bin\ComUtility.exe
     [string]$OutDir = '',   # default: <repo>\build\gui-run
     [string]$HardwarePort = 'COM6',
     [string]$SshTarget = 'sshprobe@localhost',   # ssh / sshfiles scenarios: user@host[:port] of a reachable OpenSSH server
@@ -50,7 +50,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot   # $PSScriptRoot is not usable inside param() defaults on PowerShell 5.1
-if (-not $Exe) { $Exe = Join-Path $repoRoot 'dist\Release\bin\BuildAI-SerialUtility.exe' }
+if (-not $Exe) { $Exe = Join-Path $repoRoot 'dist\Release\bin\ComUtility.exe' }
 if (-not $OutDir) { $OutDir = Join-Path $repoRoot 'build\gui-run' }
 elseif (-not [System.IO.Path]::IsPathRooted($OutDir)) { $OutDir = Join-Path (Get-Location).Path $OutDir }   # the ssh scenario hands paths to the app, which runs in another directory
 if (-not (Test-Path $Exe)) { throw "Executable not found: $Exe (run scripts\build.ps1 -Config Release -Deploy first)" }
@@ -230,7 +230,7 @@ switch ($Scenario) {
     StartApp @('--connect', $HardwarePort)
     Start-Sleep -Seconds 2; Shot 'connected'
     Keys 'hello loopback 0123456789{ENTER}' 1000; Shot 'echo'
-    Keys 'BuildAI Serial Utility{ENTER}' 1000; Shot 'echo2'
+    Keys 'ComUtility{ENTER}' 1000; Shot 'echo2'
     CloseApp
   }
   'markmode' {
@@ -314,7 +314,7 @@ switch ($Scenario) {
     if (-not $password) { throw "empty password in $SshPasswordFile" }
     # Point the app at a temporary known_hosts so the run is deterministic (the host-key dialog
     # appears on the first connect) and the user's real ~/.ssh/known_hosts stays untouched.
-    $regKey = 'HKCU:\Software\BuildAI\SerialUtility\ssh'
+    $regKey = 'HKCU:\Software\ComUtility\ComUtility\ssh'
     if (-not (Test-Path $regKey)) { New-Item -Path $regKey -Force | Out-Null }
     $oldKnownHosts = (Get-ItemProperty -Path $regKey -Name knownHostsFile -ErrorAction SilentlyContinue).knownHostsFile
     $tmpKnownHosts = Join-Path $OutDir 'smoke_known_hosts'
@@ -387,14 +387,14 @@ switch ($Scenario) {
     if (-not $SshPasswordFile -or -not (Test-Path $SshPasswordFile)) { throw "sshfiles scenario needs -SshPasswordFile <file with the password on its first line>" }
     $password = (Get-Content $SshPasswordFile -TotalCount 1).Trim()
     if (-not $password) { throw "empty password in $SshPasswordFile" }
-    $regKey = 'HKCU:\Software\BuildAI\SerialUtility\ssh'
+    $regKey = 'HKCU:\Software\ComUtility\ComUtility\ssh'
     if (-not (Test-Path $regKey)) { New-Item -Path $regKey -Force | Out-Null }
     $oldKnownHosts = (Get-ItemProperty -Path $regKey -Name knownHostsFile -ErrorAction SilentlyContinue).knownHostsFile
     $tmpKnownHosts = Join-Path $OutDir 'smoke_known_hosts'
     Remove-Item $tmpKnownHosts -ErrorAction SilentlyContinue
     Set-ItemProperty -Path $regKey -Name knownHostsFile -Value $tmpKnownHosts
     # The dialog remembers its last paths in the same registry hive: keep the user's own.
-    $pathsKey = 'HKCU:\Software\BuildAI\SerialUtility\remoteFile'
+    $pathsKey = 'HKCU:\Software\ComUtility\ComUtility\remoteFile'
     $oldPaths = Get-ItemProperty -Path $pathsKey -ErrorAction SilentlyContinue
     # The local files: a 3 MB one with a space and a non-ASCII character in its name, a 60 MB one to cancel.
     $smallName = "smoke upload " + [char]0x00FC + ".bin"

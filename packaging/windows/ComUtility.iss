@@ -1,7 +1,7 @@
-; Inno Setup 6 script for the BuildAI Serial Utility Windows installer.
+; Inno Setup 6 script for the ComUtility Windows installer.
 ;
 ; Compile (CI or locally, after `scripts\build.ps1 -Config Release -Deploy`):
-;   ISCC.exe /DAppVersion=0.1.0 /DSourceDir=..\..\dist\Release\bin /DOutputDir=..\..\dist\installer BuildAI-SerialUtility.iss
+;   ISCC.exe /DAppVersion=0.1.0 /DSourceDir=..\..\dist\Release\bin /DOutputDir=..\..\dist\installer ComUtility.iss
 ; SourceDir must be the windeployqt output (exe + Qt DLLs + plugin folders).
 
 #ifndef AppVersion
@@ -14,25 +14,23 @@
   #define OutputDir "..\..\dist\installer"
 #endif
 
-#define AppName "BuildAI Serial Utility"
-#define AppExeName "BuildAI-SerialUtility.exe"
-#define AppPublisher "BuildAI"
-#define AppURL "https://build.ai"
+#define AppName "ComUtility"
+#define AppExeName "ComUtility.exe"
+#define AppURL "https://moses-ai.us"
 
 [Setup]
 AppId={{9B40AC82-DDF5-4ACC-AD60-A73B55A9FF25}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
-AppPublisher={#AppPublisher}
 AppPublisherURL={#AppURL}
 AppSupportURL={#AppURL}
-DefaultDirName={autopf}\BuildAI\SerialUtility
+DefaultDirName={autopf}\ComUtility
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 OutputDir={#OutputDir}
-OutputBaseFilename=BuildAI-SerialUtility-{#AppVersion}-windows-x64-setup
-SetupIconFile=..\..\resources\icons\buildai.ico
+OutputBaseFilename=ComUtility-{#AppVersion}-windows-x64-setup
+SetupIconFile=..\..\resources\icons\comutility.ico
 UninstallDisplayIcon={app}\{#AppExeName}
 UninstallDisplayName={#AppName}
 Compression=lzma2/max
@@ -44,7 +42,6 @@ PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=dialog
 LicenseFile=..\..\packaging\windows\license.txt
 VersionInfoVersion={#AppVersion}
-VersionInfoCompany={#AppPublisher}
 VersionInfoDescription={#AppName} installer
 CloseApplications=yes
 RestartApplications=no
@@ -62,7 +59,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "installdrivers"; Description: "Install the Rockchip USB drivers (DriverAssistant)"; GroupDescription: "Firmware tab (Node board):"; Flags: unchecked; Check: IsAdminInstallMode
 
 [Files]
-; Everything the deploy put into bin\: both executables (BuildAI-SerialUtility.exe and the su-fw.exe
+; Everything the deploy put into bin\: both executables (ComUtility.exe and the su-fw.exe
 ; console tool, v0.6.0), the Qt DLLs and plugins, libssh, libcrypto and tools\.
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\..\README.md"; DestDir: "{app}"; Flags: ignoreversion

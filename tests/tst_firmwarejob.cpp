@@ -331,10 +331,10 @@ private:
 void Tst_firmwarejob::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
     // (v0.8.0) The pid in the name: the test-mode data folder (firmware.lock, inventory.json) is this
     // run's own, so two runs of the suite at once (two build folders) never meet on the lock.
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-firmwarejob-%1").arg(QCoreApplication::applicationPid()));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-firmwarejob-%1").arg(QCoreApplication::applicationPid()));
     QVERIFY(m_tempDir.isValid());
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));

@@ -362,8 +362,8 @@ private:
 void Tst_sessionwidget::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-session"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-session"));
     QVERIFY(m_tempDir.isValid());
 
     // AppSettings uses the default QSettings() constructor: keep it out of the registry and
@@ -372,8 +372,8 @@ void Tst_sessionwidget::initTestCase()
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("BuildAI-Test")));
-    QVERIFY(settings.fileName().contains(QStringLiteral("SerialUtilityTest-session")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtility-Test")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtilityTest-session")));
 
     AppSettings& app = AppSettings::instance();
     app.setLogDirectory(m_tempDir.filePath(QStringLiteral("logs")));
@@ -871,11 +871,11 @@ void Tst_sessionwidget::loopbackLogging()
     const QString text = QString::fromUtf8(readFile(logPath));
     const QStringList lines = text.split(QLatin1Char('\n'));
     QVERIFY2(lines.size() >= 3, qPrintable(text));
-    // Header written exactly once: "# BuildAI Serial Utility log - <port> <settings> - started <time>".
+    // Header written exactly once: "# ComUtility log - <port> <settings> - started <time>".
     QVERIFY2(
-        lines.at(0).startsWith(QStringLiteral("# BuildAI Serial Utility log - SIM:loopback 115200 8N1 - started ")),
+        lines.at(0).startsWith(QStringLiteral("# ComUtility log - SIM:loopback 115200 8N1 - started ")),
         qPrintable(lines.at(0)));
-    QCOMPARE(lines.at(0).count(QStringLiteral("BuildAI Serial Utility log")), qsizetype(1));
+    QCOMPARE(lines.at(0).count(QStringLiteral("ComUtility log")), qsizetype(1));
     QCOMPARE(lines.at(0).count(QStringLiteral("started")), qsizetype(1));
     // TX on its own timestamped line with escaped bytes, RX prefixed with a timestamp.
     const QRegularExpression txLine(
@@ -934,7 +934,7 @@ void Tst_sessionwidget::loopbackAutoLogOnConnect()
     session->toggleLogging(); // active -> stop
     QVERIFY(!session->isLogging());
     const QString text = QString::fromUtf8(readFile(logPath));
-    QVERIFY2(text.startsWith(QStringLiteral("# BuildAI Serial Utility log - SIM:loopback")), qPrintable(text));
+    QVERIFY2(text.startsWith(QStringLiteral("# ComUtility log - SIM:loopback")), qPrintable(text));
     QVERIFY(text.contains(QStringLiteral("TX> auto\\r")));
 }
 
@@ -972,9 +972,9 @@ void Tst_sessionwidget::autoLogSwitchesFileOnPortChange()
 
     // Each file's header names its own port.
     const QString headerA = QString::fromUtf8(readFile(pathA)).section(QLatin1Char('\n'), 0, 0);
-    QVERIFY2(headerA.startsWith(QStringLiteral("# BuildAI Serial Utility log - SIM:loopback ")), qPrintable(headerA));
+    QVERIFY2(headerA.startsWith(QStringLiteral("# ComUtility log - SIM:loopback ")), qPrintable(headerA));
     const QString headerB = QString::fromUtf8(readFile(pathB)).section(QLatin1Char('\n'), 0, 0);
-    QVERIFY2(headerB.startsWith(QStringLiteral("# BuildAI Serial Utility log - SIM:linux ")), qPrintable(headerB));
+    QVERIFY2(headerB.startsWith(QStringLiteral("# ComUtility log - SIM:linux ")), qPrintable(headerB));
 
     session->disconnectPort();
 }
@@ -1879,7 +1879,7 @@ void Tst_sessionwidget::autoBaudConnectDetectsLinux()
     QVERIFY2(QFileInfo(logPath).fileName().startsWith(QStringLiteral("SIM_linux_")), qPrintable(logPath));
     session->stopLogging();
     const QString header = QString::fromUtf8(readFile(logPath)).section(QLatin1Char('\n'), 0, 0);
-    QVERIFY2(header.startsWith(QStringLiteral("# BuildAI Serial Utility log - SIM:linux Auto (1500000) 8N1")),
+    QVERIFY2(header.startsWith(QStringLiteral("# ComUtility log - SIM:linux Auto (1500000) 8N1")),
              qPrintable(header));
     QVERIFY(QString::fromUtf8(readFile(logPath)).contains(QStringLiteral("rv1106 login:")));
 
@@ -1970,7 +1970,7 @@ void Tst_sessionwidget::manualDetectOnFixedRate()
     QVERIFY(sim);
     QCOMPARE(sim->nativeBaudRate(), kMcuBaud);
     QTRY_VERIFY_WITH_TIMEOUT(session->connection()->bytesReceived() > 100, kSimTimeoutMs);
-    QVERIFY(!allText(terminal).contains(QStringLiteral("BuildAI MCU shell")));
+    QVERIFY(!allText(terminal).contains(QStringLiteral("Demo MCU shell")));
 
     // Make the firmware chatty (telemetry every 100 ms), then let it talk at its own rate again.
     sim->setNativeBaudRate(9600);
@@ -2701,7 +2701,7 @@ void Tst_sessionwidget::replayTimestampedCapture()
     QVERIFY(session);
     const QString path = tempPath(QStringLiteral("capture-text.log"));
     const QByteArray capture =
-        QByteArrayLiteral("# BuildAI Serial Utility log - SIM:linux 115200 8N1 - started 2026-09-20 10:00:00.000\n"
+        QByteArrayLiteral("# ComUtility log - SIM:linux 115200 8N1 - started 2026-09-20 10:00:00.000\n"
                           "[2026-09-20 10:00:00.900] [root@rv1106:~]# \n"
                           "[2026-09-20 10:00:01.000] TX> uname -a\\r\n"
                           "[2026-09-20 10:00:01.050] uname -a\n"
@@ -2724,7 +2724,7 @@ void Tst_sessionwidget::replayTimestampedCapture()
     QVERIFY2(text.contains(QStringLiteral("[root@rv1106:~]# uname -a")), qPrintable(text));
     // The host's own input and the header are not part of the device stream.
     QVERIFY(!text.contains(QStringLiteral("TX>")));
-    QVERIFY(!text.contains(QStringLiteral("# BuildAI")));
+    QVERIFY(!text.contains(QStringLiteral("# ComUtility")));
     QVERIFY(!text.contains(QStringLiteral("2026-09-20 10:00")));
 }
 
@@ -3052,7 +3052,7 @@ void Tst_sessionwidget::sshLogHeaderUsesDisplayName()
     QVERIFY(!session->isLogging());
 
     const QString header = QString::fromUtf8(readFile(logPath)).section(QLatin1Char('\n'), 0, 0);
-    QVERIFY2(header.startsWith(QStringLiteral("# BuildAI Serial Utility log - root@10.0.0.24:2222 ")),
+    QVERIFY2(header.startsWith(QStringLiteral("# ComUtility log - root@10.0.0.24:2222 ")),
              qPrintable(header));
     QVERIFY2(header.contains(session->transport()->summary()), qPrintable(header));
 }

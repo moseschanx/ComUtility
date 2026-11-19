@@ -415,15 +415,15 @@ private:
 void Tst_testsshserver::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-testsshserver"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-testsshserver"));
     m_tmp = std::make_unique<QTemporaryDir>();
     QVERIFY(m_tmp->isValid());
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tmp->filePath(QStringLiteral("settings")));
     QSettings settings;
     settings.clear();
-    QVERIFY(settings.fileName().contains(QStringLiteral("BuildAI-Test")));
+    QVERIFY(settings.fileName().contains(QStringLiteral("ComUtility-Test")));
 }
 
 void Tst_testsshserver::init()

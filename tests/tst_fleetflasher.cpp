@@ -348,7 +348,7 @@ private:
 void Tst_fleetflasher::initTestCase()
 {
     QVERIFY(m_tempDir.isValid());
-    QLoggingCategory::setFilterRules(QStringLiteral("buildai.*.info=false"));
+    QLoggingCategory::setFilterRules(QStringLiteral("comutility.*.info=false"));
     qRegisterMetaType<FleetFlasher::Snapshot>();
     qRegisterMetaType<FleetFlasher::Verdict>();
 }
@@ -2012,7 +2012,7 @@ void Tst_fleetflasher::retryLinesNameTheToolPath()
 {
     // The bundled tool is not on PATH: a retry line carries the path the run used, so it runs as it is.
     FleetRig rig(caseDir());
-    const QString tool = QStringLiteral("C:/Program Files/BuildAI/SerialUtility/tools/upgrade_tool.exe");
+    const QString tool = QStringLiteral("C:/Program Files/ComUtility/tools/upgrade_tool.exe");
     rig.flasher.setToolPaths(tool, QStringLiteral("adb"));
     rig.flasher.setBoards(benchBoards({0, 1}));
     rig.bus.setWriteFailure(serialOf(1), QStringLiteral("rootfs.img"), "Write LBA failed, err=-3\r\n", 1);
@@ -2028,7 +2028,7 @@ void Tst_fleetflasher::retryLinesNameTheToolPath()
                                ToolRunner::formatCommandLine(program, {QStringLiteral("-s"), n, QStringLiteral("RD")})};
     QCOMPARE(b.retry, retry);
 #ifdef Q_OS_WIN
-    QCOMPARE(b.retry.last(), QStringLiteral("\"C:\\Program Files\\BuildAI\\SerialUtility\\tools\\upgrade_tool.exe\" -s %1 RD").arg(n));
+    QCOMPARE(b.retry.last(), QStringLiteral("\"C:\\Program Files\\ComUtility\\tools\\upgrade_tool.exe\" -s %1 RD").arg(n));
 #endif
     QVERIFY(rig.lineIndex(b.label() + QStringLiteral("   retry: ") + retry.at(0)) >= 0);
     QVERIFY(rig.lineIndex(b.label() + QStringLiteral("   retry: ") + retry.at(1)) >= 0);

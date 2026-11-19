@@ -1,4 +1,4 @@
-# Tests for BuildAI Serial Utility.
+# Tests for ComUtility.
 #  - su_add_test:     UI-free suites linked against su_core (QTEST_GUILESS_MAIN)
 #  - su_add_gui_test: widget/dialog suites linked against su_app (QTEST_MAIN, run offscreen)
 # ctest sets QT_QPA_PLATFORM=offscreen and puts the Qt bin directory on PATH.

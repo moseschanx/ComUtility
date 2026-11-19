@@ -507,10 +507,10 @@ private:
 void Tst_firmwarecli::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setOrganizationName(QStringLiteral("BuildAI-Test"));
+    QCoreApplication::setOrganizationName(QStringLiteral("ComUtility-Test"));
     // (v0.8.0) The pid in the name: the test-mode data folder (firmware.lock, inventory.json) is this
     // run's own, so two runs of the suite at once (two build folders) never meet on the lock.
-    QCoreApplication::setApplicationName(QStringLiteral("SerialUtilityTest-firmwarecli-%1").arg(QCoreApplication::applicationPid()));
+    QCoreApplication::setApplicationName(QStringLiteral("ComUtilityTest-firmwarecli-%1").arg(QCoreApplication::applicationPid()));
     QVERIFY(m_tempDir.isValid());
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_tempDir.filePath(QStringLiteral("settings")));
@@ -518,7 +518,7 @@ void Tst_firmwarecli::initTestCase()
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     qputenv("SU_SSH_IGNORE_CONFIG", "1");   // the SSH connects of this suite must not read ~/.ssh/config
     qunsetenv("SSH_AUTH_SOCK");             // nor offer the developer's agent keys to the test server
-    QLoggingCategory::setFilterRules(QStringLiteral("buildai.*.info=false"));   // as su-fw does
+    QLoggingCategory::setFilterRules(QStringLiteral("comutility.*.info=false"));   // as su-fw does
 }
 
 void Tst_firmwarecli::cleanupTestCase()
@@ -606,8 +606,8 @@ void Tst_firmwarecli::versionText()
     const CliResult version = rig.run({QStringLiteral("--version")});
     QCOMPARE(version.code, 0);
     QCOMPARE(version.out, FirmwareCli::versionText() + QLatin1Char('\n'));
-    QVERIFY(version.out.startsWith(QStringLiteral("su-fw " APP_VERSION " (BuildAI Serial Utility, ")));
-    QCOMPARE(QStringLiteral(APP_VERSION), QStringLiteral("0.8.0"));
+    QVERIFY(version.out.startsWith(QStringLiteral("su-fw " APP_VERSION " (ComUtility, ")));
+    QCOMPARE(QStringLiteral(APP_VERSION), QStringLiteral("0.9.0"));
 }
 
 void Tst_firmwarecli::usageErrorsGoToStderr()
@@ -2918,7 +2918,7 @@ void Tst_firmwarecli::realExecutable()
     QCOMPARE(runIt({QStringLiteral("flash-soc"), QStringLiteral("--help")}, &out, &err), 0);
     QVERIFY(out.contains("--partitions NAMES"));
     QCOMPARE(runIt({QStringLiteral("--version")}, &out, &err), 0);
-    QVERIFY2(out.startsWith("su-fw " APP_VERSION " (BuildAI Serial Utility, "), out.constData());
+    QVERIFY2(out.startsWith("su-fw " APP_VERSION " (ComUtility, "), out.constData());
     QCOMPARE(runIt({QStringLiteral("status"), QStringLiteral("--bogus")}, &out, &err), 2);
     QVERIFY2(out.isEmpty(), out.constData());
     QVERIFY2(err.startsWith("su-fw: Unknown option 'bogus'."), err.constData());
@@ -3295,7 +3295,7 @@ void Tst_firmwarecli::helpMentionsProfiles()
         QVERIFY2(FirmwareCli::helpText(QLatin1String(command)).contains(QStringLiteral("\n  --profile ID ")), command);
     }
     QVERIFY(FirmwareCli::helpText().startsWith(
-        QStringLiteral("su-fw - flash the BuildAI Node and Stacked boards (RV1106 SoC + CC1310 RF MCU) from a command shell\n")));
+        QStringLiteral("su-fw - flash the Node and Stacked boards (RV1106 SoC + CC1310 RF MCU) from a command shell\n")));
 }
 
 // =======================================================================================

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>About BuildAI Serial Utility</string>
+   <string>About ComUtility</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -34,7 +34,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../../resources/resources.qrc">:/icons/buildai_64.png</pixmap>
+        <pixmap resource="../../resources/resources.qrc">:/icons/comutility_64.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -53,7 +53,7 @@
         </font>
        </property>
        <property name="text">
-        <string>BuildAI Serial Utility</string>
+        <string>ComUtility</string>
        </property>
        <property name="textFormat">
         <enum>Qt::TextFormat::RichText</enum>

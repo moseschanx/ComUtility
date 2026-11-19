@@ -38,7 +38,7 @@ QString settingsKey(const QString& key)
 
 #if defined(Q_OS_WIN)
 
-const char kEntropy[] = "BuildAI-SerialUtility-SecretStore-v1";
+const char kEntropy[] = "ComUtility-SecretStore-v1";
 
 DATA_BLOB entropyBlob()
 {
@@ -55,7 +55,7 @@ std::optional<QByteArray> protect(const QByteArray& plain)
     in.cbData = static_cast<DWORD>(plain.size());
     DATA_BLOB entropy = entropyBlob();
     DATA_BLOB out{};
-    if (!CryptProtectData(&in, L"BuildAI Serial Utility", &entropy, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &out)) {
+    if (!CryptProtectData(&in, L"ComUtility", &entropy, nullptr, nullptr, CRYPTPROTECT_UI_FORBIDDEN, &out)) {
         const DWORD lastError = GetLastError();
         qCWarning(lcSsh) << "CryptProtectData failed:" << lastError;
         return std::nullopt;

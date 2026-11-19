@@ -22,7 +22,7 @@ Q_DECLARE_METATYPE(LogLevel)
 
 /**
  * Console-like viewer for the application's own diagnostics, hosted in a QDockWidget by
- * MainWindow ("View > System Log"). Same look as the Vispek reference tool: dark
+ * MainWindow ("View > System Log"). Same look as the earlier reference tool: dark
  * background, monospace, colour-coded level tags, timestamps.
  *
  * - installMessageHandler() installs a qInstallMessageHandler hook that forwards every Qt

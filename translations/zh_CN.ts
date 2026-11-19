@@ -5,13 +5,13 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../src/dialogs/AboutDialog.ui" line="+14"/>
-        <source>About BuildAI Serial Utility</source>
-        <translation>关于 BuildAI 串口工具</translation>
+        <source>About ComUtility</source>
+        <translation>关于 ComUtility</translation>
     </message>
     <message>
         <location line="+42"/>
-        <source>BuildAI Serial Utility</source>
-        <translation>BuildAI 串口工具</translation>
+        <source>ComUtility</source>
+        <translation>ComUtility</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -41,18 +41,18 @@
     </message>
     <message>
         <location line="+3"/>
-        <source>&lt;p&gt;A multi-tab serial-port terminal for the boards BuildAI works with every day.&lt;/p&gt;&lt;p&gt;It speaks to &lt;b&gt;Rockchip Linux boards&lt;/b&gt; (U-Boot prompt and Linux console at 115200 or 1500000 baud), to &lt;b&gt;MCU firmware shells&lt;/b&gt; (STM32, ESP32, RP2040 via CH34x, CP210x, FTDI or J-Link CDC adapters) and to anything else that talks over a UART.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Highlights&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;VT100 / xterm terminal emulation with colours, scrollback and CJK support&lt;/li&gt;&lt;li&gt;Auto-reconnect when a board reboots or a USB adapter is re-plugged&lt;/li&gt;&lt;li&gt;Quick commands, paced file send, hex view and session logging&lt;/li&gt;&lt;li&gt;Live line-parameter changes, DTR/RTS control and BREAK&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Homepage: &lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;&lt;/p&gt;</source>
-        <translation>&lt;p&gt;一款多标签页串口终端，面向 BuildAI 日常使用的各类开发板。&lt;/p&gt;&lt;p&gt;它可以与 &lt;b&gt;Rockchip Linux 开发板&lt;/b&gt;（U-Boot 提示符以及 115200 或 1500000 波特率的 Linux 控制台）、&lt;b&gt;MCU 固件 shell&lt;/b&gt;（通过 CH34x、CP210x、FTDI 或 J-Link CDC 适配器连接的 STM32、ESP32、RP2040）以及任何通过 UART 通信的设备对话。&lt;/p&gt;&lt;p&gt;&lt;b&gt;主要特性&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;VT100 / xterm 终端仿真，支持颜色、回滚缓冲区和中日韩字符&lt;/li&gt;&lt;li&gt;开发板重启或 USB 适配器重新插拔时自动重连&lt;/li&gt;&lt;li&gt;快捷命令、限速文件发送、十六进制视图和会话日志&lt;/li&gt;&lt;li&gt;实时修改线路参数、DTR/RTS 控制和 BREAK 信号&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;主页：&lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;&lt;/p&gt;</translation>
+        <source>&lt;p&gt;A multi-tab serial-port terminal for everyday work with embedded boards.&lt;/p&gt;&lt;p&gt;It speaks to &lt;b&gt;Rockchip Linux boards&lt;/b&gt; (U-Boot prompt and Linux console at 115200 or 1500000 baud), to &lt;b&gt;MCU firmware shells&lt;/b&gt; (STM32, ESP32, RP2040 via CH34x, CP210x, FTDI or J-Link CDC adapters) and to anything else that talks over a UART.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Highlights&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;VT100 / xterm terminal emulation with colours, scrollback and CJK support&lt;/li&gt;&lt;li&gt;Auto-reconnect when a board reboots or a USB adapter is re-plugged&lt;/li&gt;&lt;li&gt;Quick commands, paced file send, hex view and session logging&lt;/li&gt;&lt;li&gt;Live line-parameter changes, DTR/RTS control and BREAK&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Homepage: &lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
-        <source>&lt;p&gt;&lt;b&gt;Copyright &amp;copy; 2026 BuildAI&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Developed by the BuildAI engineering team as a replacement for ad-hoc use of PuTTY, minicom and SecureCRT.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Built with:&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Qt %1 - cross-platform application framework (Core, Gui, Widgets, SerialPort)&lt;/li&gt;&lt;li&gt;C++20 - modern C++ standard&lt;/li&gt;&lt;li&gt;CMake and Ninja - build system&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Terminal emulation follows the VT500-series parser described at &lt;a href=&quot;https://vt100.net/emu/dec_ansi_parser&quot;&gt;vt100.net&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;版权所有 &amp;copy; 2026 BuildAI&lt;/b&gt;&lt;/p&gt;&lt;p&gt;由 BuildAI 工程团队开发，用于替代临时使用的 PuTTY、minicom 和 SecureCRT。&lt;/p&gt;&lt;p&gt;&lt;b&gt;构建工具：&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Qt %1 - 跨平台应用程序框架（Core、Gui、Widgets、SerialPort）&lt;/li&gt;&lt;li&gt;C++20 - 现代 C++ 标准&lt;/li&gt;&lt;li&gt;CMake 与 Ninja - 构建系统&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;终端仿真遵循 &lt;a href=&quot;https://vt100.net/emu/dec_ansi_parser&quot;&gt;vt100.net&lt;/a&gt; 所描述的 VT500 系列解析器。&lt;/p&gt;</translation>
+        <source>&lt;p&gt;Written as a replacement for ad-hoc use of PuTTY, minicom and SecureCRT.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Built with:&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Qt %1 - cross-platform application framework (Core, Gui, Widgets, SerialPort)&lt;/li&gt;&lt;li&gt;C++20 - modern C++ standard&lt;/li&gt;&lt;li&gt;CMake and Ninja - build system&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Terminal emulation follows the VT500-series parser described at &lt;a href=&quot;https://vt100.net/emu/dec_ansi_parser&quot;&gt;vt100.net&lt;/a&gt;.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+15"/>
-        <source>&lt;p&gt;&lt;b&gt;License&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Copyright &amp;copy; 2026 BuildAI. All rights reserved.&lt;/p&gt;&lt;p&gt;This software is provided to BuildAI staff and partners for developing, testing and servicing BuildAI hardware. Redistribution outside BuildAI requires written permission.&lt;/p&gt;&lt;p&gt;Qt is used under the terms of the GNU Lesser General Public License v3. See &lt;a href=&quot;https://www.qt.io/licensing&quot;&gt;qt.io/licensing&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;许可&lt;/b&gt;&lt;/p&gt;&lt;p&gt;版权所有 &amp;copy; 2026 BuildAI。保留所有权利。&lt;/p&gt;&lt;p&gt;本软件提供给 BuildAI 员工及合作伙伴，用于开发、测试和维护 BuildAI 硬件。未经书面许可，不得在 BuildAI 之外再分发。&lt;/p&gt;&lt;p&gt;Qt 依据 GNU 宽通用公共许可证第 3 版（LGPL v3）使用。详见 &lt;a href=&quot;https://www.qt.io/licensing&quot;&gt;qt.io/licensing&lt;/a&gt;。&lt;/p&gt;</translation>
+        <location line="+14"/>
+        <source>&lt;p&gt;&lt;b&gt;License&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Copyright &amp;copy; 2026 the ComUtility author. All rights reserved.&lt;/p&gt;&lt;p&gt;ComUtility is a personal tool. Redistribution requires written permission.&lt;/p&gt;&lt;p&gt;Qt is used under the terms of the GNU Lesser General Public License v3. See &lt;a href=&quot;https://www.qt.io/licensing&quot;&gt;qt.io/licensing&lt;/a&gt;.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3086,7 +3086,7 @@ Only replace the stored key if you are sure the change is expected.</source>
 <context>
     <name>LogReplayer</name>
     <message>
-        <location filename="../src/core/LogReplayer.cpp" line="+57"/>
+        <location filename="../src/core/LogReplayer.cpp" line="+63"/>
         <source>A replay is already running</source>
         <translation>已有回放正在进行</translation>
     </message>
@@ -3125,8 +3125,8 @@ Only replace the stored key if you are sure the change is expected.</source>
     <name>MainWindow</name>
     <message>
         <location filename="../src/ui/MainWindow.ui" line="+14"/>
-        <source>BuildAI Serial Utility</source>
-        <translation>BuildAI 串口工具</translation>
+        <source>ComUtility</source>
+        <translation>ComUtility</translation>
     </message>
     <message>
         <location line="+64"/>
@@ -3815,8 +3815,8 @@ Only replace the stored key if you are sure the change is expected.</source>
     </message>
     <message>
         <location line="+8"/>
-        <source>&amp;About BuildAI Serial Utility</source>
-        <translation>关于 BuildAI 串口工具(&amp;A)</translation>
+        <source>&amp;About ComUtility</source>
+        <translation>关于 ComUtility(&amp;A)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -3825,8 +3825,8 @@ Only replace the stored key if you are sure the change is expected.</source>
     </message>
     <message>
         <location line="+8"/>
-        <source>BuildAI &amp;Homepage</source>
-        <translation>BuildAI 主页(&amp;H)</translation>
+        <source>&amp;Homepage</source>
+        <translation>主页(&amp;H)</translation>
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="+553"/>
@@ -8249,8 +8249,8 @@ You will be asked for it when connecting.</source>
     </message>
     <message>
         <location line="+12"/>
-        <source>BuildAI Serial Utility</source>
-        <translation>BuildAI 串口工具</translation>
+        <source>ComUtility</source>
+        <translation>ComUtility</translation>
     </message>
     <message>
         <location line="+10"/>

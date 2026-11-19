@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.22)
 # 3.22: ENVIRONMENT_MODIFICATION test property (tests/CMakeLists.txt puts Qt's bin dir on PATH for
 # ctest on Windows). CMakePresets.json (schema v6) separately requires 3.25.
 
-project(SerialUtility
-    VERSION 0.8.0
-    DESCRIPTION "BuildAI Serial Utility - a serial-port terminal for Rockchip Linux boards and MCU shells"
-    HOMEPAGE_URL "https://build.ai"
+project(ComUtility
+    VERSION 0.9.0
+    DESCRIPTION "ComUtility - a serial-port terminal for Rockchip Linux boards and MCU shells"
+    HOMEPAGE_URL "https://moses-ai.us"
     LANGUAGES CXX)
 
 # ---------------------------------------------------------------------------
@@ -23,7 +23,7 @@ endif()
 option(SU_BUILD_TESTS "Build the unit tests (Qt Test)" ON)
 option(SU_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
-set(SU_APP_OUTPUT_NAME "BuildAI-SerialUtility")
+set(SU_APP_OUTPUT_NAME "ComUtility")
 
 # ---------------------------------------------------------------------------
 # Qt
@@ -46,7 +46,7 @@ endif()
 
 qt_standard_project_setup()   # AUTOMOC / AUTOUIC, CMAKE_INCLUDE_CURRENT_DIR
 # qt_standard_project_setup() does not enable AUTORCC; resources/resources.qrc is listed as a
-# plain source of the executables (SerialUtility and the GUI tests), so it must be on for
+# plain source of the executables (ComUtility and the GUI tests), so it must be on for
 # :/icons/* to exist at run time.
 set(CMAKE_AUTORCC ON)
 
@@ -360,16 +360,16 @@ if(WIN32)
     list(APPEND SU_APP_SOURCES resources/resources.rc)
 endif()
 
-qt_add_executable(SerialUtility WIN32 MACOSX_BUNDLE ${SU_APP_SOURCES})
-set_target_properties(SerialUtility PROPERTIES
+qt_add_executable(ComUtility WIN32 MACOSX_BUNDLE ${SU_APP_SOURCES})
+set_target_properties(ComUtility PROPERTIES
     OUTPUT_NAME "${SU_APP_OUTPUT_NAME}"
-    MACOSX_BUNDLE_BUNDLE_NAME "BuildAI Serial Utility"
-    MACOSX_BUNDLE_GUI_IDENTIFIER "ai.build.serialutility"
+    MACOSX_BUNDLE_BUNDLE_NAME "ComUtility"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "us.moses-ai.comutility"
     MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
     MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
-target_link_libraries(SerialUtility PRIVATE su_app)
-su_set_compile_options(SerialUtility)
-su_copy_runtime_dlls(SerialUtility)
+target_link_libraries(ComUtility PRIVATE su_app)
+su_set_compile_options(ComUtility)
+su_copy_runtime_dlls(ComUtility)
 
 # su-fw (v0.6.0): the Firmware tab's operations for a command shell, scripts and AI agents
 # (docs/firmware-update/CLI_PLAN.md). A console program of its own - no WIN32 keyword - because the
@@ -387,13 +387,13 @@ su_copy_runtime_dlls(su_fw)
 # ---------------------------------------------------------------------------
 # The Firmware tab starts Rockchip's upgrade_tool and adb as separate processes and looks for them in
 # tools/ next to the executable (tools/upgrade_tool[.exe], tools/adb.exe,
-# tools/DriverAssistant/DriverInstall.exe). The folder is assembled after every link of SerialUtility, so
+# tools/DriverAssistant/DriverInstall.exe). The folder is assembled after every link of ComUtility, so
 # a build tree runs the tab as it is, and `cmake --install` ships the very same folder as bin/tools.
-# su-fw sits in the same folder and uses the same tools/ (in a build tree: once SerialUtility was built;
+# su-fw sits in the same folder and uses the same tools/ (in a build tree: once ComUtility was built;
 # the copy is not repeated for su_fw, whose link may run in parallel and would race for the same files).
 # The sources are plain files under third_party/ (provenance and licences: third_party/README.md).
 set(SU_THIRD_PARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")
-set(SU_TOOLS_DIR "$<TARGET_FILE_DIR:SerialUtility>/tools")
+set(SU_TOOLS_DIR "$<TARGET_FILE_DIR:ComUtility>/tools")
 set(SU_TOOL_FILES "")
 set(SU_TOOL_DRIVER_DIR "")
 if(WIN32)
@@ -459,23 +459,23 @@ if(SU_TOOL_FILES OR SU_TOOL_DRIVER_DIR)
     if(SU_TOOL_DRIVER_DIR)
         list(APPEND _su_tool_deps "${SU_DRIVER_ZIP}")
     endif()
-    set_property(TARGET SerialUtility APPEND PROPERTY LINK_DEPENDS ${_su_tool_deps})
-    add_custom_command(TARGET SerialUtility POST_BUILD
+    set_property(TARGET ComUtility APPEND PROPERTY LINK_DEPENDS ${_su_tool_deps})
+    add_custom_command(TARGET ComUtility POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${SU_TOOLS_DIR}"
         VERBATIM)
     if(SU_TOOL_FILES)
-        add_custom_command(TARGET SerialUtility POST_BUILD
+        add_custom_command(TARGET ComUtility POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SU_TOOL_FILES} "${SU_TOOLS_DIR}"
             VERBATIM)
     endif()
     if(SU_TOOL_DRIVER_DIR)
-        add_custom_command(TARGET SerialUtility POST_BUILD
+        add_custom_command(TARGET ComUtility POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E ${_su_copy_dir} "${SU_TOOL_DRIVER_DIR}" "${SU_TOOLS_DIR}/DriverAssistant"
             VERBATIM)
     endif()
     if(UNIX AND NOT APPLE AND EXISTS "${SU_THIRD_PARTY_DIR}/rockchip/linux/upgrade_tool")
         # Git on Windows may not have recorded the executable bit of the vendor binary.
-        add_custom_command(TARGET SerialUtility POST_BUILD
+        add_custom_command(TARGET ComUtility POST_BUILD
             COMMAND chmod 755 "${SU_TOOLS_DIR}/upgrade_tool"
             VERBATIM)
     endif()
@@ -484,7 +484,7 @@ endif()
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
-set(SU_TRANSLATION_TARGETS SerialUtility)
+set(SU_TRANSLATION_TARGETS ComUtility)
 if(SU_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
@@ -503,7 +503,7 @@ set(SU_TS_FILES
 )
 qt_add_translations(
     TARGETS ${SU_TRANSLATION_TARGETS}
-    SOURCE_TARGETS su_app su_core SerialUtility
+    SOURCE_TARGETS su_app su_core ComUtility
     TS_FILES ${SU_TS_FILES}
     RESOURCE_PREFIX "/translations"
     LUPDATE_OPTIONS -no-obsolete -locations relative)
@@ -528,7 +528,7 @@ endif()
 # ---------------------------------------------------------------------------
 # Install / deploy  (cmake --install <build> --prefix <dist>)
 # ---------------------------------------------------------------------------
-install(TARGETS SerialUtility su_fw
+install(TARGETS ComUtility su_fw
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION bin)
 install(FILES README.md VERSION.txt DESTINATION .)
@@ -549,7 +549,7 @@ elseif(UNIX AND NOT APPLE)
 endif()
 
 qt_generate_deploy_app_script(
-    TARGET SerialUtility
+    TARGET ComUtility
     OUTPUT_SCRIPT su_deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
     NO_TRANSLATIONS)
@@ -584,7 +584,7 @@ install(SCRIPT "${su_fw_deploy_script}")
 # Summary
 # ---------------------------------------------------------------------------
 message(STATUS "")
-message(STATUS "BuildAI Serial Utility ${PROJECT_VERSION} (${APP_GIT_HASH})")
+message(STATUS "ComUtility ${PROJECT_VERSION} (${APP_GIT_HASH})")
 message(STATUS "  Qt            : ${Qt6_VERSION} (${Qt6_DIR})")
 message(STATUS "  Compiler      : ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "  Build type    : ${CMAKE_BUILD_TYPE}")

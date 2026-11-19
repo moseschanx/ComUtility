@@ -163,11 +163,11 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationDomain(QStringLiteral(APP_ORGANIZATION_DOMAIN));
     QCoreApplication::setApplicationName(QStringLiteral(APP_NAME));
     QCoreApplication::setApplicationVersion(QStringLiteral(APP_VERSION));
-    // The job mirrors every log line to the "buildai.firmware" category for the GUI's System Log,
+    // The job mirrors every log line to the "comutility.firmware" category for the GUI's System Log,
     // and the SSH stack warns about a refused connect that the job reports anyway: on a console
     // that would repeat lines on stderr, which stays for usage errors. QT_LOGGING_RULES (e.g.
-    // "buildai.*=true") still turns them on for a diagnosis; Qt's own messages are untouched.
-    QLoggingCategory::setFilterRules(QStringLiteral("buildai.*.debug=false\nbuildai.*.info=false\nbuildai.*.warning=false"));
+    // "comutility.*=true") still turns them on for a diagnosis; Qt's own messages are untouched.
+    QLoggingCategory::setFilterRules(QStringLiteral("comutility.*.debug=false\ncomutility.*.info=false\ncomutility.*.warning=false"));
 
 #ifdef Q_OS_WIN
     const Utf8ConsoleOutput utf8Output;

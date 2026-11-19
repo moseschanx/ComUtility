@@ -1,6 +1,6 @@
-# BuildAI Serial Utility — Test Report (v0.1.0 2026-09-21, v0.2.0 addendum 2026-09-27, v0.3.0 addendum 2026-09-27, v0.4.0 addendum 2026-09-27, v0.5.0 addendum 2026-10-13)
+# ComUtility — Test Report (v0.1.0 2026-09-21, v0.2.0 addendum 2026-09-27, v0.3.0 addendum 2026-09-27, v0.4.0 addendum 2026-09-27, v0.5.0 addendum 2026-10-13)
 
-This report records how the first release of BuildAI Serial Utility was verified on
+This report records how the first release of ComUtility was verified on
 2026-09-20/21, what was tested at each layer, what was found and fixed, and what could
 not be verified on the build machine. Re-run instructions are at the end.
 
@@ -194,7 +194,7 @@ Final full runs on Windows (MSVC 2022, Release, fresh configure) and on Linux, o
 | Ubuntu 22.04 WSL GCC 11 `-Werror`, Qt 6.8.3 (aqtinstall), fresh configure | 22 | 100 % passed (0 warnings, 0 errors; `tst_sshconnection` 38.7 s, `tst_sshsession` 15.1 s); `cmake --install` bundle self-contained (`libssh.so.4`, `libcrypto.so.3` resolved from `lib/`, `--version` starts under xvfb) |
 
 CI: run 36274255360 (main, a3c6f0f) and the tag run 36274619537 (v0.3.0) green on Ubuntu (GCC `-Werror`)
-and Windows (MSVC `/WX`); the release workflow published `BuildAI-SerialUtility-0.3.0-windows-x64-setup.exe`,
+and Windows (MSVC `/WX`); the release workflow published `ComUtility-0.3.0-windows-x64-setup.exe`,
 `-windows-x64.zip`, `-linux-x64.tar.gz` and `SHA256SUMS.txt` at
 <https://github.com/moseschanxx/SerialUtility/releases/tag/v0.3.0>.
 
@@ -447,3 +447,21 @@ is in RV1106G2_FACTS.md section 2 and in the profiles report: `su-fw status --js
 --image <G2 update.img> --json` (chip tag 1106, six rows), the dry run, `adb reboot loader` + `LD` + `RD`,
 then `--partitions userdata`, then `boot` with the running build; never a loader partition until the
 MASKROM entry is known.
+
+## 18. v0.9.0 — renamed to ComUtility (2026-11-19)
+
+Why: Moses, 2026-11-06 and again 2026-11-19: the app is his personal tool **ComUtility**, with no
+identifier of the earlier name anywhere in the project, his homepage https://moses-ai.us in the Help
+menu and the About box, no organisation shown, and his existing settings and saved passwords kept.
+
+| Check | Result |
+|---|---|
+| Name scan | `git grep -il "build.\?ai"` prints nothing (code, UI, docs, tests, translations, packaging, CI, file names, icons); the earlier company-name scan prints nothing |
+| Windows MSVC Release (`scripts\build.ps1 -Config Release -Test`, this PC, 4 cores) | 33 / 33 suites: 32 passed in the full run (632 s); `tst_firmwarecli` failed only its pinned version (`APP_VERSION == "0.8.0"`), was updated to 0.9.0 and passed alone (59 s) |
+| New cases | `tst_logreplayer`: a capture whose header carries an earlier app name is still recognised as a timestamped capture (the header is matched by its shape), and a header without settings |
+| Real exe on screen (build/Release, input lock) | title "ComUtility 0.9.0 - <restored SSH target>"; Help menu: Version Information, Homepage, About ComUtility; About: the terminal logo, "ComUtility", "Version 0.9.0", "Homepage: https://moses-ai.us", Credits without an organisation, License "Copyright © 2026 the ComUtility author"; Help > Homepage opened the default browser on https://moses-ai.us (page title matched) |
+| Old settings kept (one-shot migration script kept outside the repository) | registry tree and data folder copied, 2 of 2 saved SSH passwords re-encrypted and verified, 18 data files with equal sizes; the new app restored the last SSH tab, 8 SSH targets, 44 quick commands and the language, and Connect logged in with the saved password without a prompt |
+| Qt Creator (Debug preset) | reconfigured with project `ComUtility` and built `ComUtility.exe`; `ninja -n` reports no work |
+
+Not verified: the Linux and macOS packages of the CI (built on the next push), and the installer upgrading an
+earlier install in place (same AppId; no installer was run on this PC).

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Configure, build, test and optionally deploy BuildAI Serial Utility with MSVC + Ninja + Qt 6.
+    Configure, build, test and optionally deploy ComUtility with MSVC + Ninja + Qt 6.
 
 .DESCRIPTION
     Sets up the Visual Studio x64 environment (vcvars64.bat) inside this PowerShell
@@ -46,7 +46,7 @@ $ErrorActionPreference = 'Stop'
 
 # --- Guard: -Test / -Deploy / -Run need the full build ---------------------------
 # A restricted -Target build leaves the test executables (tests/CMakeLists.txt) and/or
-# BuildAI-SerialUtility.exe unbuilt or stale; ctest / cmake --install / Start-Process
+# ComUtility.exe unbuilt or stale; ctest / cmake --install / Start-Process
 # would then fail with 'Could not find executable' or, worse, silently use old binaries.
 if ($Target.Count -gt 0 -and ($Test -or $Deploy -or $Run)) {
     throw '-Test, -Deploy and -Run require a full build; drop -Target (or run them in a separate invocation without -Target).'
@@ -166,7 +166,7 @@ if ($Deploy) {
 
 # --- Run ---------------------------------------------------------------------
 if ($Run) {
-    $exe = Join-Path $BuildDir 'BuildAI-SerialUtility.exe'
+    $exe = Join-Path $BuildDir 'ComUtility.exe'
     if (-not (Test-Path $exe)) { throw "Executable not found: $exe" }
     Write-Step "Launching $exe"
     Start-Process -FilePath $exe -WorkingDirectory $BuildDir
