@@ -406,7 +406,7 @@ jobs:
           for exe in ComUtility su-fw; do
             rpaths=$(otool -l "$app/Contents/MacOS/$exe" | awk '/cmd LC_RPATH/{getline; getline; print $2}')
             echo "$exe rpaths:" $rpaths
-            echo "$rpaths" | grep -qx '@executable_path/../Frameworks' || { echo "::error::$exe has no rpath to Frameworks"; bad=1; }
+            echo "$rpaths" | grep -qxE '@(executable|loader)_path/\.\./Frameworks/?' || { echo "::error::$exe has no rpath to Frameworks"; bad=1; }
             if echo "$rpaths" | grep -qv '^@'; then echo "::error::$exe keeps an absolute rpath"; bad=1; fi
           done
           test "$bad" = 0

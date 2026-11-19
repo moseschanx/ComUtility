@@ -606,14 +606,24 @@ foreach(_su_exe ComUtility su-fw)
     set(_su_bin "${QT_DEPLOY_PREFIX}/ComUtility.app/Contents/MacOS/${_su_exe}")
     execute_process(COMMAND otool -l "${_su_bin}" OUTPUT_VARIABLE _su_loads COMMAND_ERROR_IS_FATAL ANY)
     string(REGEX MATCHALL "path [^\n ]+ \\(offset" _su_rpaths "${_su_loads}")
+    set(_su_has_frameworks_rpath FALSE)
     foreach(_su_rpath IN LISTS _su_rpaths)
         string(REGEX REPLACE "^path ([^\n ]+) \\(offset$" "\\1" _su_rpath "${_su_rpath}")
-        if(NOT _su_rpath MATCHES "^@")
+        if(_su_rpath MATCHES "^@(executable|loader)_path/\\.\\./Frameworks/?$")
+            set(_su_has_frameworks_rpath TRUE)
+        elseif(NOT _su_rpath MATCHES "^@")
             message(STATUS "removing rpath ${_su_rpath} from ${_su_exe}")
             execute_process(COMMAND install_name_tool -delete_rpath "${_su_rpath}" "${_su_bin}"
                             COMMAND_ERROR_IS_FATAL ANY)
         endif()
     endforeach()
+    # macdeployqt adds the rpath to Contents/Frameworks (as @loader_path/../Frameworks when it is
+    # given extra executables) only to a binary from which it removed a build rpath; make sure.
+    if(NOT _su_has_frameworks_rpath)
+        message(STATUS "adding rpath @executable_path/../Frameworks to ${_su_exe}")
+        execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../Frameworks" "${_su_bin}"
+                        COMMAND_ERROR_IS_FATAL ANY)
+    endif()
 endforeach()
 # Signature: Apple Silicon runs no unsigned code, and the install_name_tool edits above and in
 # macdeployqt break the linker's ad-hoc signature, so the whole bundle is signed ad hoc again
