@@ -1352,9 +1352,11 @@ void Tst_sshconnection::e2eTerminalSize()
     c.received.clear();
     c.conn.notifyTerminalSize(100, 30);
     QCOMPARE(c.conn.lastTerminalSize(), QStringLiteral("100 x 30"));
+    // The window-change request goes out from the connection's own thread: wait until the server
+    // has it before asking the shell (the Apple Silicon CI runner once answered with the old size).
+    QTRY_COMPARE_WITH_TIMEOUT(server.lastPtySize(), QSize(100, 30), kE2eTimeoutMs);
     c.conn.write(QByteArrayLiteral("size\r"));
     QTRY_VERIFY2_WITH_TIMEOUT(c.received.contains("COLS=100 ROWS=30\r\n$ "), c.received.constData(), kE2eTimeoutMs);
-    QCOMPARE(server.lastPtySize(), QSize(100, 30));
     c.received.clear();
     c.conn.write(QByteArrayLiteral("env\r"));
     QTRY_VERIFY2_WITH_TIMEOUT(c.received.contains("TERM=vt220 COLS=100 ROWS=30\r\n"), c.received.constData(), kE2eTimeoutMs);

@@ -287,7 +287,7 @@ int runConsoleParent(int argc, char** argv)
         toolProbe = result;
         toolProbeDone = true;
     });
-    if (!QTest::qWaitFor([&]() { return toolProbeDone; }, 15000)) {
+    if (!FirmwareFixtures::waitFor([&]() { return toolProbeDone; }, 15000)) {
         report += "timeout: the tool probe\n";
     }
     QProcess plainProbe;
@@ -309,12 +309,12 @@ int runConsoleParent(int argc, char** argv)
     plainSleeper.setProcessChannelMode(QProcess::MergedChannels);
     plainSleeper.start(self, helperArguments("sleep", "3000"));
     plainSleeper.waitForReadyRead(15000);
-    if (!QTest::qWaitFor([&]() { return toolSleeping; }, 15000)) {
+    if (!FirmwareFixtures::waitFor([&]() { return toolSleeping; }, 15000)) {
         report += "timeout: the sleeping tool\n";
     }
     GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, 0);   // every process attached to this console
     plainSleeper.waitForFinished(15000);
-    if (!QTest::qWaitFor([&]() { return toolSleepDone; }, 15000)) {
+    if (!FirmwareFixtures::waitFor([&]() { return toolSleepDone; }, 15000)) {
         report += "timeout: the end of the sleeping tool\n";
     }
     const bool plainRanOn = plainSleeper.exitStatus() == QProcess::NormalExit && plainSleeper.readAll().contains("woke");
@@ -2632,7 +2632,7 @@ void tst_firmwaretools::link_socketCarriesData()
     QVERIFY(socket != nullptr);
     QCOMPARE(socket->state(), QAbstractSocket::ConnectedState);
     QCOMPARE(socket->peerPort(), rig.port);
-    QCOMPARE(socket->socketOption(QAbstractSocket::LowDelayOption).toInt(), 1);
+    QVERIFY(socket->socketOption(QAbstractSocket::LowDelayOption).toInt() != 0);   // macOS reports TCP_NODELAY as 4
 
     peer->write("OK version=0.8.1 role=rx\r\n");
     QTRY_COMPARE(socket->bytesAvailable(), qint64(QByteArray("OK version=0.8.1 role=rx\r\n").size()));

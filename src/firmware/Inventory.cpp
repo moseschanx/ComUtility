@@ -2,6 +2,7 @@
 
 #include <QCryptographicHash>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -394,7 +395,22 @@ bool Inventory::update(const QString& serial, const Change& change, QString* err
     // One writer at a time, across processes: the tab and every su-fw on this PC.
     QLockFile lock(d->path + QStringLiteral(".lock"));
     lock.setStaleLockTime(kStaleLockMs);
-    if (!lock.tryLock(kLockWaitMs)) {
+    // Not tryLock(kLockWaitMs): it sleeps 100, 200, 400 ... ms between its tries, so a writer that
+    // comes back at once (the tab and su-fw in a fleet run, two su-fw) can hold the lock at every
+    // try for the whole wait (the Windows CI run of writersInTwoProcesses). A try every 10 ms gets in
+    // between two of its writes. On Windows a try can also meet the other writer's lock file while it
+    // is being deleted and get "permission denied" for a moment, so that is retried as well; a real
+    // permission problem is still reported, after the wait.
+    QElapsedTimer waited;
+    waited.start();
+    bool locked = lock.tryLock(0);
+    while (!locked
+           && (lock.error() == QLockFile::LockFailedError || lock.error() == QLockFile::PermissionError)
+           && waited.elapsed() < kLockWaitMs) {
+        QThread::msleep(10);
+        locked = lock.tryLock(0);
+    }
+    if (!locked) {
         if (lock.error() == QLockFile::LockFailedError) {
             qint64 pid = 0;
             QString host;

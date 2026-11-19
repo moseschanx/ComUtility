@@ -28,6 +28,7 @@
 #include "app/Logging.h"
 #include "firmware/CcProtocol.h"
 #include "firmware/FirmwareJob.h"
+#include "firmware/FleetFlasher.h"
 #include "firmware/McuLink.h"
 #include "firmware/McuUpdater.h"
 #include "firmware/SocFlasher.h"
@@ -91,7 +92,7 @@ public:
     QString logText() const { return log.join(QLatin1Char('\n')); }
     bool waitForOperation(int count = 1, int timeoutMs = kOpTimeoutMs) const
     {
-        return QTest::qWaitFor([&]() { return operations.size() >= count; }, timeoutMs);
+        return FirmwareFixtures::waitFor([&]() { return operations.size() >= count; }, timeoutMs);
     }
     Result lastOperation() const { return operations.isEmpty() ? Result() : operations.last(); }
     QStringList stepNames() const
@@ -150,6 +151,9 @@ std::unique_ptr<FirmwareJob> makeJob(FakeToolRunner* runner, SshProfileStore* st
     job->setProfileStore(store);
     job->setToolPaths(QStringLiteral("upgrade_tool"), QStringLiteral("adb"));
     job->socFlasher()->setPollIntervalMs(10);
+    // An empty USB bus on every system: the CI machine's own bus decides nothing, and macOS (no
+    // port probe, so FleetFlasher refuses a fleet run there) runs the same cases as the others.
+    job->fleetFlasher()->setUsbEnumerator([](quint16) { return QList<UsbDeviceInfo>(); });
     return job;
 }
 
@@ -169,7 +173,7 @@ void scriptMaskrom(FakeToolRunner& runner)
 
 bool waitForPlan(const FirmwareJob& job)
 {
-    return QTest::qWaitFor([&]() { return job.planState() == FirmwareJob::PlanState::Ready && job.partitions().size() == 7; },
+    return FirmwareFixtures::waitFor([&]() { return job.planState() == FirmwareJob::PlanState::Ready && job.partitions().size() == 7; },
                            kOpTimeoutMs);
 }
 
@@ -1574,7 +1578,7 @@ void Tst_firmwarejob::downloadModeMootWhenBoardAppeared()
     job->setDownloadModeHandler([&, present, raw]() {
         *present = true;
         // The question's own event loop: the flasher goes on meanwhile.
-        appeared = QTest::qWaitFor([raw]() { return raw->socFlasher()->phase() != SocFlasher::Phase::WaitingForLoader; },
+        appeared = FirmwareFixtures::waitFor([raw]() { return raw->socFlasher()->phase() != SocFlasher::Phase::WaitingForLoader; },
                                    kOpTimeoutMs);
         FirmwareJob::DownloadModeAnswer answer;
         answer.asked = true;
@@ -2345,7 +2349,7 @@ namespace {
 /// The plan of `job` is Ready with `rows` rows.
 bool waitForRows(const FirmwareJob& job, qsizetype rows)
 {
-    return QTest::qWaitFor([&]() { return job.planState() == FirmwareJob::PlanState::Ready && job.partitions().size() == rows; },
+    return FirmwareFixtures::waitFor([&]() { return job.planState() == FirmwareJob::PlanState::Ready && job.partitions().size() == rows; },
                            kOpTimeoutMs);
 }
 
@@ -2740,7 +2744,7 @@ void Tst_firmwarejob::boardProfileIgnoresMaskromPid()
         job->setProfileOverride(overrideId);
         QSignalSpy statuses(job.get(), &FirmwareJob::statusChanged);
         job->refreshStatus();
-        if (!QTest::qWaitFor([&statuses]() { return statuses.count() > 0; }, kOpTimeoutMs)) {
+        if (!FirmwareFixtures::waitFor([&statuses]() { return statuses.count() > 0; }, kOpTimeoutMs)) {
             return std::make_pair(SocFlasher::DeviceStatus(), ProfileDetection());   // no status: every check below fails
         }
         return std::make_pair(job->lastStatus(), job->boardProfile());

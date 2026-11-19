@@ -453,7 +453,7 @@ bool Tst_firmwaretab::showAndActivate(MainWindow& w)
         return false;
     }
     w.activateWindow();
-    return QTest::qWaitFor([&w]() { return QApplication::activeWindow() == &w; }, 5000);
+    return FirmwareFixtures::waitFor([&w]() { return QApplication::activeWindow() == &w; }, 5000);
 }
 
 QString Tst_firmwaretab::tempPath(const QString& name) const
@@ -1545,7 +1545,7 @@ void Tst_firmwaretab::pullAndFlashUpdatesMcuInUpdater()
     const auto runChain = [&]() {
         finished.clear();
         tab->pullAndFlash();
-        return QTest::qWaitFor([&]() { return !finished.isEmpty() && finished.last().at(0).toString() == QLatin1String("pull-flash"); },
+        return FirmwareFixtures::waitFor([&]() { return !finished.isEmpty() && finished.last().at(0).toString() == QLatin1String("pull-flash"); },
                                60000);
     };
 
@@ -1642,12 +1642,12 @@ void Tst_firmwaretab::downloadModeQuestionOnlyWhileWaiting()
     });
     user.start();
     const auto finishFlash = [&]() {
-        if (!QTest::qWaitFor([&]() { return !uf.isNull(); }, kOpTimeoutMs)) {
+        if (!FirmwareFixtures::waitFor([&]() { return !uf.isNull(); }, kOpTimeoutMs)) {
             return false;
         }
         uf->emitOutput("Upgrade firmware ok.\r\n");
         uf->finish(0);
-        return QTest::qWaitFor([&]() { return !finished.isEmpty(); }, kOpTimeoutMs);
+        return FirmwareFixtures::waitFor([&]() { return !finished.isEmpty(); }, kOpTimeoutMs);
     };
 
     // 1. The board appears with the question open: it closes by itself, nothing is sent.
@@ -1715,7 +1715,7 @@ namespace {
 /// The tab showing the seven rows of a freshly selected image (the label says so).
 bool waitForTable(const FirmwareTab& tab, const QString& labelStart = QStringLiteral("7 partitions"))
 {
-    return QTest::qWaitFor([&]() {
+    return FirmwareFixtures::waitFor([&]() {
         return tab.partitionTable()->rowCount() == 7 && tab.partitionsLabel()->text().startsWith(labelStart);
     }, kOpTimeoutMs);
 }
@@ -2185,7 +2185,7 @@ private:
 
 bool waitForRowCount(const FirmwareTab& tab, int rows, const QString& labelStart)
 {
-    return QTest::qWaitFor([&]() { return tab.partitionTable()->rowCount() == rows && tab.partitionsLabel()->text().startsWith(labelStart); },
+    return FirmwareFixtures::waitFor([&]() { return tab.partitionTable()->rowCount() == rows && tab.partitionsLabel()->text().startsWith(labelStart); },
                            kOpTimeoutMs);
 }
 
@@ -2318,7 +2318,9 @@ void Tst_firmwaretab::layoutConflictDialog()
         tab->flashSoc();
         QTRY_COMPARE_WITH_TIMEOUT(finished.count(), qsizetype(1), kOpTimeoutMs);
         QCOMPARE(user.asked, 1);
+#ifndef Q_OS_MACOS   // Qt drops a QMessageBox's title on macOS (Apple's message boxes show none)
         QCOMPARE(user.titles.first(), QStringLiteral("Firmware Update"));
+#endif
         QCOMPARE(user.defaults.first(), QStringLiteral("Cancel"));
         QVERIFY2(user.texts.first().startsWith(QStringLiteral("the image's flash layout differs from the board's (image: %1; board: %2)")
                                                    .arg(kNodeMtdParts, older)),
@@ -2833,7 +2835,9 @@ void Tst_firmwaretab::closeRefusedWhileBusyAndQuitAsks()
         w.close();
         no.stop();
         QCOMPARE(no.count(), 1);
+#ifndef Q_OS_MACOS   // Qt drops a QMessageBox's title on macOS (Apple's message boxes show none)
         QVERIFY(no.windowTitles().first().startsWith(QStringLiteral("Quit")));
+#endif
         QVERIFY2(no.texts().first().contains(QStringLiteral("UART updater")), qPrintable(no.texts().first()));
         QVERIFY(no.texts().first().contains(QStringLiteral("Quit anyway?")));
     }

@@ -1,10 +1,15 @@
 #pragma once
 
 #include <QByteArray>
+#include <QCoreApplication>
+#include <QDeadlineTimer>
+#include <QEvent>
+#include <QEventLoop>
 #include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 #include <QTemporaryDir>
+#include <QTimer>
 #include <memory>
 
 #include "ssh/SshProfile.h"
@@ -189,5 +194,27 @@ struct BuildMachine
     bool start(SshProfileStore* store, const QString& workDir);
     QString target() const;            ///< "test@127.0.0.1:<port>"
 };
+
+/// QTest::qWaitFor() without its sleeps. qWaitFor() sleeps up to 10 ms after every pass of the event
+/// loop that leaves `done` false; on the macOS CI runners those sleeps last much longer, so a ping-pong
+/// over loopback stalled at each turn (the MCU update's 610 DATA frames took 100 ms each and ran past
+/// kChainTimeoutMs). This one blocks in the event dispatcher and goes on at the next event, as the
+/// application's own loop does; a 10 ms timer wakes it to look at `done` and the deadline when `done`
+/// changes without an event (another process, a thread).
+template <typename Predicate>
+bool waitFor(Predicate done, int timeoutMs)
+{
+    const QDeadlineTimer deadline(timeoutMs);
+    QTimer wake;
+    wake.start(10);
+    while (!done()) {
+        if (deadline.hasExpired()) {
+            return done();
+        }
+        QCoreApplication::processEvents(QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents);
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    }
+    return true;
+}
 
 } // namespace FirmwareFixtures

@@ -13,6 +13,8 @@
 #include <QStringEncoder>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 #include "app/AppSettings.h"
 #include "app/Logging.h"
 #include "core/BaudRateDetector.h"
@@ -85,6 +87,7 @@ void SessionWidget::init(SshProfileStore* profiles)
         m_baudDetector->setConnection(m_connection);
         m_baudDetector->setQuietMs(kWatchdogQuietMs);
     }
+    m_watchdogQuietMs = kWatchdogQuietMs;
     m_logger = new SessionLogger(this);
     m_clock.start();
 
@@ -1462,13 +1465,21 @@ void SessionWidget::onDataReceived(const QByteArray& bytes)
     }
 }
 
+void SessionWidget::setWatchdogQuietMs(int ms)
+{
+    m_watchdogQuietMs = std::max(0, ms);
+    if (m_baudDetector) {
+        m_baudDetector->setQuietMs(m_watchdogQuietMs);
+    }
+}
+
 void SessionWidget::onGarbageDetected(double score)
 {
     if (!m_connection->isOpen() || isDetectingBaud() || !m_connection->settings().autoBaud) {
         return;
     }
     const qint64 now = m_clock.elapsed();
-    if (m_lastWatchdogDetectMs >= 0 && now - m_lastWatchdogDetectMs < kWatchdogQuietMs) {
+    if (m_lastWatchdogDetectMs >= 0 && now - m_lastWatchdogDetectMs < m_watchdogQuietMs) {
         qCDebug(lcSerial) << m_connection->portName() << "unreadable output (score" << score
                           << ") - re-detection skipped, last one" << (now - m_lastWatchdogDetectMs) << "ms ago";
         return;

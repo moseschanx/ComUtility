@@ -190,7 +190,7 @@ QList<UsbDeviceInfo> oneBusAddressGadget(quint16)
 
 bool waitForRows(const FirmwareJob& job, int rows)
 {
-    return QTest::qWaitFor([&]() { return job.planState() == FirmwareJob::PlanState::Ready && job.partitions().size() == rows; },
+    return FirmwareFixtures::waitFor([&]() { return job.planState() == FirmwareJob::PlanState::Ready && job.partitions().size() == rows; },
                            kOpTimeoutMs);
 }
 
@@ -608,7 +608,7 @@ void Tst_inventory::writersInTwoProcesses()
     child.setProcessChannelMode(QProcess::MergedChannels);
     child.start();
     QVERIFY2(child.waitForStarted(30000), qPrintable(child.errorString()));
-    QVERIFY2(QTest::qWaitFor([&file]() { return QFileInfo::exists(file + QStringLiteral(".ready")); }, 120000),
+    QVERIFY2(FirmwareFixtures::waitFor([&file]() { return QFileInfo::exists(file + QStringLiteral(".ready")); }, 120000),
              qPrintable(QString::fromUtf8(child.readAll())));
     QVERIFY(writeFile(file + QStringLiteral(".go"), "go"));
     const QString problem = writeRounds(file, QStringLiteral("parent"), kWriterRounds);
@@ -999,13 +999,13 @@ void Tst_inventory::recorderSameImageMergesRows()
                 return false;
             }
         }
-        if (!QTest::qWaitFor([&]() { return runner.liveInvocations().isEmpty(); }, kOpTimeoutMs)) {   // the last flash's status
+        if (!FirmwareFixtures::waitFor([&]() { return runner.liveInvocations().isEmpty(); }, kOpTimeoutMs)) {   // the last flash's status
             return false;
         }
         job->setSelectedPartitions(rows);
         const qsizetype before = finished.count();
         job->flashSoc();
-        if (!QTest::qWaitFor([&]() { return finished.count() > before; }, kOpTimeoutMs)) {
+        if (!FirmwareFixtures::waitFor([&]() { return finished.count() > before; }, kOpTimeoutMs)) {
             return false;
         }
         return finished.last().at(1).toBool();
@@ -1289,7 +1289,7 @@ void Tst_inventory::recorderStatusWithoutSerialClears()
     const auto query = [&]() {
         job->refreshStatus();
         ++statuses;
-        return QTest::qWaitFor([&]() { return status.count() == statuses; }, kOpTimeoutMs);
+        return FirmwareFixtures::waitFor([&]() { return status.count() == statuses; }, kOpTimeoutMs);
     };
 
     QVERIFY(query());

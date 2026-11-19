@@ -2178,8 +2178,10 @@ void Tst_sshsession::closeWindowWhileConnected()
         action(*w, "actionQuit")->trigger();
         responder.stop();
         QCOMPARE(responder.messageBoxes, 1);
+#ifndef Q_OS_MACOS   // Qt drops a QMessageBox's title on macOS (Apple's message boxes show none)
         QVERIFY2(responder.messageTitles.first().startsWith(QStringLiteral("Quit")),
                  qPrintable(responder.messageTitles.first()));
+#endif
         QVERIFY2(responder.unexpected.isEmpty(), qPrintable(responder.unexpected.join(QStringLiteral(", "))));
     }
     QVERIFY(w->isVisible());

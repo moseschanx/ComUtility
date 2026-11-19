@@ -750,7 +750,9 @@ void Tst_mainwindow::quitAsksWhenConnected()
         QCOMPARE(dismisser.count(), 1);
         QCOMPARE(dismisser.classNames().first(), QStringLiteral("QMessageBox"));
         // The quit variant says "Quit", not "Close Session" (which would read as "close this tab").
+#ifndef Q_OS_MACOS   // Qt drops a QMessageBox's title on macOS (Apple's message boxes show none)
         QVERIFY(dismisser.windowTitles().first().startsWith(QStringLiteral("Quit")));
+#endif
     }
     QVERIFY(w.isVisible());
     QVERIFY(session->isConnected());
@@ -2677,8 +2679,19 @@ void Tst_mainwindow::shortcutEntriesContract()
                                            {"Alt+W", "", "Window menu"},
                                            {"Alt+L", "", "Language menu"},
                                            {"Alt+H", "", "Help menu"}};
+#ifdef Q_OS_MACOS
+    // macOS has no menu mnemonics (QKeySequence::mnemonic() is empty there): only the tab alternates.
+    QCOMPARE(fixed.size(), qsizetype(2));
+#else
     QCOMPARE(fixed.size(), static_cast<qsizetype>(std::size(expectedFixed)));
+#endif
     for (const ExpectedFixed& e : expectedFixed) {
+#ifdef Q_OS_MACOS
+        if (*e.name == 0) {
+            QVERIFY2(fixedFor(e.sequence) == nullptr, e.sequence);
+            continue;
+        }
+#endif
         const ShortcutEntry* entry = fixedFor(e.sequence);
         QVERIFY2(entry != nullptr, e.sequence);
         QCOMPARE(entry->objectName, QString::fromLatin1(e.name));

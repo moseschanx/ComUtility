@@ -1895,6 +1895,9 @@ void Tst_sessionwidget::autoBaudWatchdogRedetects()
     QVERIFY(session);
     TerminalWidget* terminal = session->terminal();
     ConnectionBar* bar = session->connectionBar();
+    // A quiet period longer than the whole case: the second switch below lands inside it however
+    // slow the machine is (the macOS CI runners took more than the default 5 s to get there).
+    session->setWatchdogQuietMs(120000);
     QVERIFY(connectTo(session.get(), kLinux, kAutoBaud));
     QTRY_VERIFY_WITH_TIMEOUT(allText(terminal).contains(detectedLine(1500000)), kSimTimeoutMs);
     QTRY_VERIFY_WITH_TIMEOUT(allText(terminal).contains(QStringLiteral("rv1106 login:")), kBootTimeoutMs);

@@ -227,6 +227,11 @@ public:
     /// autoReconnect/interval to the transport (both kinds).
     void applyPreferences();
 
+    /// The watchdog's quiet period (default kWatchdogQuietMs, 5 s): the bound between two
+    /// re-detections and the detector's quietMs. The tests lengthen it, so the bound they check
+    /// does not depend on how fast the machine reaches the second switch.
+    void setWatchdogQuietMs(int ms);
+
 public slots:
     /// Serial: open the port selected in the ConnectionBar with its settings; returns success
     /// (true when already open). SSH: start the connect sequence for the bar's target; returns
@@ -374,6 +379,7 @@ private:
     QByteArray m_detectSample;               ///< RX bytes of the candidate being tried (replayed when it wins)
     QElapsedTimer m_clock;
     qint64 m_lastWatchdogDetectMs = -1;      ///< m_clock time of the last watchdog-triggered detection
+    int m_watchdogQuietMs = 0;               ///< kWatchdogQuietMs unless setWatchdogQuietMs() changed it
     ViewMode m_viewMode = ViewMode::Terminal;
     /// Target (port name / SSH display name) the active log was auto-started for; empty when the
     /// log was started by the user or no log is active.

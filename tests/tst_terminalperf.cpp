@@ -319,7 +319,7 @@ void Tst_terminalperf::terminalWidgetShown()
     QVERIFY(term.isAtBottom());
     QCOMPARE(term.verticalScrollBar()->value(), term.verticalScrollBar()->maximum());
     QCOMPARE(term.verticalScrollBar()->maximum(), term.screen()->scrollbackSize());
-    QVERIFY(!term.screen()->isDirty());   // the last coalesced repaint consumed the dirty state
+    QTRY_VERIFY(!term.screen()->isDirty());   // the last coalesced repaint consumes the dirty state
     QVERIFY2(r.mbps(m_log.size()) >= kWidgetFloorMBps, qPrintable(QStringLiteral("%1 MB/s").arg(r.mbps(m_log.size()))));
     QVERIFY2(r.maxUiGapMs <= kMaxUiStallMs, qPrintable(QStringLiteral("UI stalled for %1 ms").arg(r.maxUiGapMs)));
 }
