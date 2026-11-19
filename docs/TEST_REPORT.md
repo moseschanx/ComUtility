@@ -463,5 +463,8 @@ menu and the About box, no organisation shown, and his existing settings and sav
 | Old settings kept (one-shot migration script kept outside the repository) | registry tree and data folder copied, 2 of 2 saved SSH passwords re-encrypted and verified, 18 data files with equal sizes; the new app restored the last SSH tab, 8 SSH targets, 44 quick commands and the language, and Connect logged in with the saved password without a prompt |
 | Qt Creator (Debug preset) | reconfigured with project `ComUtility` and built `ComUtility.exe`; `ninja -n` reports no work |
 
-Not verified: the Linux and macOS packages of the CI (built on the next push), and the installer upgrading an
-earlier install in place (same AppId; no installer was run on this PC).
+| macOS packages (added the same day, Moses: "pack up ... for intel mac and apple silicon mac too") | CI jobs `build-macos` (Apple Silicon on `macos-15`, Intel on `macos-15-intel`): OpenSSL 3.5.9 built from source for macOS 12 (SHA-256 pinned and checked against the published sum), Apple Clang build, all suites offscreen, `cmake --install` -> `ComUtility.app` through `macdeployqt` with su-fw inside, then checks: every Mach-O file of the bundle has the job's processor and references only the bundle or the system, both executables keep only `@executable_path/../Frameworks` as rpath, the signature verifies, and the app and su-fw start with the Qt SDK and the OpenSSL build moved away; the disk image mounts and verifies again. On this PC: the CMake changes reconfigure and build Release unchanged, `cmake --install` gives the same Windows package (all 18 files CI requires), and the rpath clean-up of the macOS deploy script was run in CMake script mode on a sample `otool -l` output (keeps `@executable_path/../Frameworks`, removes a build path) |
+
+Not verified: the Linux package and both macOS packages of the CI (they are built on the next push; no Mac is
+available here, so the macOS jobs have never run - Apple Clang warnings are listed in the job, not fatal), and
+the installer upgrading an earlier install in place (same AppId; no installer was run on this PC).

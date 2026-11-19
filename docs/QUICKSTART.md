@@ -13,6 +13,8 @@ cd ComUtility
 
 Linux: install Qt >= 6.8 first (see README "Plain CMake (Linux)": Debian 13 / Ubuntu 25.10+ apt packages incl. `qt6-l10n-tools`, or aqtinstall 6.8.3 gcc_64 + `-DCMAKE_PREFIX_PATH`), then `cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build && ./build/ComUtility`
 
+macOS: install Qt 6.8.3 `clang_64` (aqtinstall), Ninja and OpenSSL 3, then build and `cmake --install build --prefix dist` for a self-contained `dist/ComUtility.app` (README "macOS"). Released disk images: drag ComUtility to Applications; the first start needs System Settings > Privacy & Security > **Open Anyway** (not notarized). The Rockchip flashing tools are not bundled on macOS; set `adb` in Preferences > Firmware.
+
 Qt Creator: open `CMakeLists.txt`, pick the `Release` preset, press Run.
 
 **No board on the desk?** Pick `SIM:linux` in the port list and press **Connect**: a
@@ -115,7 +117,7 @@ the CC1310 commands (`help`, `version`, `sys`, `stack`, `uart`, `power`, `bat`, 
 
 | Item | Location |
 |---|---|
-| Settings | Registry (Windows) / `~/.config/ComUtility/ComUtility.conf` (Linux) |
+| Settings | Registry (Windows) / `~/.config/ComUtility/ComUtility.conf` (Linux) / `~/Library/Preferences/us.moses-ai.ComUtility.plist` (macOS) |
 | Quick commands, history, SSH profiles | `QStandardPaths::AppConfigLocation` -> `quick_commands.json`, `history.txt`, `ssh_profiles.json` (no secrets; saved passwords go to DPAPI-protected settings) |
 | Pulled firmware images | the Firmware tab's *Local cache* folder (default `<data dir>/firmware`: `update.img`, the previous `update.prev.img` and their `.json` notes) |
 | Flashing tools | `tools\` next to the executable (`upgrade_tool.exe`, `adb.exe`, `DriverAssistant\`); other copies via *Preferences > Firmware* |

@@ -1,6 +1,6 @@
 # ComUtility
 
-CI: `.github/workflows/build.yml` builds and tests on Ubuntu and Windows for every push and publishes a release on `v*` tags.
+CI: `.github/workflows/build.yml` builds and tests on Ubuntu, Windows and macOS (Apple Silicon and Intel) for every push and publishes a release on `v*` tags.
 
 A multi-tab serial-port terminal for everyday work with embedded boards: **Rockchip
 Linux boards** (U-Boot prompt and Linux console at 115200 or 1 500 000 baud) and **MCU firmware
@@ -101,11 +101,12 @@ flashes the Node board (Rockchip RV1106 SoC + TI CC1310 RF MCU) over its USB-C c
 | Component | Version |
 |---|---|
 | Qt | **6.8** with modules Core, Gui, Widgets, SerialPort, Network, LinguistTools (Test for the unit tests) |
-| OpenSSL | 3.x development files for libssh's crypto backend: Windows `C:\Program Files\OpenSSL-Win64` (Shining Light installer) or any prefix via `-DOPENSSL_ROOT_DIR`; Linux `libssl-dev` |
+| OpenSSL | 3.x development files for libssh's crypto backend: Windows `C:\Program Files\OpenSSL-Win64` (Shining Light installer) or any prefix via `-DOPENSSL_ROOT_DIR`; Linux `libssl-dev`; macOS a shared OpenSSL 3 built for the same macOS target via `-DOPENSSL_ROOT_DIR` (CI builds 3.5.9 from source) |
 | CMake | 3.22 or newer (3.25+ for the presets); internet access at the first configure to fetch libssh 0.11.1 |
 | Generator | Ninja |
 | Compiler (Windows) | MSVC 2022 x64 (`D:\Qt\6.8.3\msvc2022_64` is the default Qt prefix) |
 | Compiler (Linux) | GCC 12+ or Clang 15+ |
+| Compiler (macOS) | Xcode command-line tools (Apple Clang); the build targets macOS 12 and later |
 | Linux distro Qt packages | Debian 13+ / Ubuntu 25.10+ (older releases: install Qt 6.8.3 via aqtinstall) |
 
 The only third-party library besides Qt is **libssh 0.11.1**, which CMake downloads (SHA-256
@@ -218,6 +219,24 @@ QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
 ./build/ComUtility
 ```
 
+### macOS
+
+Qt 6.8.3 for macOS (`clang_64`, a universal build) with `qtserialport`, Ninja (`brew install ninja`)
+and a shared OpenSSL 3 that targets macOS 12 (Homebrew's `openssl@3` works for a build that only
+has to run on the Mac it was built on). One build per processor, as CI does:
+
+```bash
+aqt install-qt mac desktop 6.8.3 clang_64 -m qtserialport -O ~/Qt
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/Qt/6.8.3/macos \
+      -DCMAKE_OSX_ARCHITECTURES=arm64 -DOPENSSL_ROOT_DIR="$(brew --prefix openssl@3)"
+cmake --build build
+QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
+cmake --install build --prefix dist        # dist/ComUtility.app, self-contained and signed ad hoc
+open dist/ComUtility.app
+```
+
+`-DCMAKE_OSX_ARCHITECTURES=x86_64` on an Intel Mac. The packaging files are in `packaging/macos/`.
+
 ### Qt Creator
 
 *File > Open File or Project* -> `CMakeLists.txt`, then pick the `Release` or `Debug` preset
@@ -238,6 +257,13 @@ Both packages carry the flashing tools in `bin/tools/` next to the executable (W
 `88-rockusb.rules`, `license.txt`; on Linux `adb` comes from the system `PATH`). CI checks that
 they landed after `cmake --install`.
 
+On macOS `cmake --install` produces `dist/ComUtility.app` instead: a copy of the build tree's bundle
+with `su-fw` inside it (`Contents/MacOS/su-fw`), `macdeployqt` run over both (Qt frameworks,
+plugins, libssh and libcrypto into `Contents/Frameworks`, every reference pointed there) and an
+ad-hoc signature. There are no bundled flashing tools on macOS: Rockchip ships `upgrade_tool` for
+Windows and Linux only, and `adb` comes from `PATH` or Preferences > Firmware (an app started from
+the Finder does not see Homebrew's `PATH`, so set it there).
+
 ### Packaging (Windows zip + installer)
 
 ```powershell
@@ -257,9 +283,11 @@ uninstaller removes `{app}\tools`.
 ### Releasing (CI/CD)
 
 Every push and pull request runs `.github/workflows/build.yml`: Ubuntu (GCC) and Windows
-(MSVC 2022) builds with `-DSU_WARNINGS_AS_ERRORS=ON`, all Qt Test suites offscreen, a deploy
-check, and the packaged artefacts (Linux tarball, Windows zip and installer) attached to the
-run for 14 days.
+(MSVC 2022) builds with `-DSU_WARNINGS_AS_ERRORS=ON`, two macOS builds (Apple Silicon on
+`macos-15`, Intel on `macos-15-intel`; Apple Clang warnings are listed, not fatal, until the first
+runs are clean), all Qt Test suites offscreen, a deploy check per package, and the packaged
+artefacts (Linux tarball, Windows zip and installer, two macOS disk images) attached to the run
+for 14 days.
 
 A release is cut by tagging. The tag must match `project(... VERSION x.y.z)` in
 `CMakeLists.txt`, and `VERSION.txt` must have a `Vx.y.z` entry (its bullet list becomes the
@@ -274,7 +302,9 @@ git push origin v0.1.0
 
 The `release` job then publishes a GitHub Release named "ComUtility x.y.z" with
 `ComUtility-x.y.z-windows-x64-setup.exe`, `...-windows-x64.zip`,
-`...-linux-x64.tar.gz` and `SHA256SUMS.txt`. A tag containing a hyphen (`v0.2.0-rc1`) is
+`...-linux-x64.tar.gz`, `...-macos-arm64.dmg`, `...-macos-x64.dmg` and `SHA256SUMS.txt`. The macOS
+images are not notarized (no Apple Developer ID): the first start is refused once, then System
+Settings > Privacy & Security > **Open Anyway** lets it run. A tag containing a hyphen (`v0.2.0-rc1`) is
 published as a pre-release.
 
 ## Usage guide
@@ -1047,10 +1077,10 @@ ComUtility/
 ```
 
 Settings are stored under the QSettings scope `ComUtility` / `ComUtility` (registry
-`HKCUSoftwareComUtilityComUtility` on Windows; the organisation name is internal, Qt needs a
+`HKCU\Software\ComUtility\ComUtility` on Windows; the organisation name is internal, Qt needs a
 non-empty one, and it is shown nowhere). Per-user data files (quick commands, history, SSH profiles,
 inventory, firmware cache) live in `QStandardPaths::AppConfigLocation`
-(`%LOCALAPPDATA%ComUtilityComUtility`).
+(`%LOCALAPPDATA%\ComUtility\ComUtility`).
 
 **Upgrading from 0.8.0 or older.** Version 0.9.0 renamed the app to ComUtility, so it no longer
 reads the settings, data folder and saved SSH passwords of the earlier name. They are moved once per

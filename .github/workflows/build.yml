@@ -264,12 +264,203 @@ jobs:
           retention-days: 14
 
   # -------------------------------------------------------------------------------------
-  # Release: only for tags v<version>. Publishes the Linux tarball, the Windows portable zip
-  # and the Windows installer with SHA-256 checksums and notes taken from VERSION.txt.
+  # macOS: one native build per processor (Apple Silicon on macos-15, Intel on macos-15-intel),
+  # each packaged as a disk image with ComUtility.app (su-fw inside it). OpenSSL is built from
+  # source for macOS 12 and later (Homebrew's copy would require the runner's own macOS version)
+  # and cached per version and processor.
+  # -------------------------------------------------------------------------------------
+  build-macos:
+    name: macOS ${{ matrix.label }} (Apple Clang, Ninja)
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Apple Silicon
+            runner: macos-15
+            arch: arm64
+            suffix: arm64
+          - label: Intel
+            runner: macos-15-intel
+            arch: x86_64
+            suffix: x64
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash   # explicit: bash -eo pipefail (the implicit default has no pipefail)
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '12.0'
+      OPENSSL_VERSION: '3.5.9'
+      OPENSSL_SHA256: '603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: mac
+          target: desktop
+          arch: clang_64
+          modules: 'qtserialport'
+          cache: true
+
+      - name: Install build tools
+        run: brew install ninja || true; ninja --version; cmake --version | head -n1
+
+      - name: Cache OpenSSL
+        id: openssl-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/openssl
+          key: openssl-${{ env.OPENSSL_VERSION }}-macos${{ env.MACOSX_DEPLOYMENT_TARGET }}-${{ matrix.arch }}
+
+      - name: Build OpenSSL ${{ env.OPENSSL_VERSION }} (shared, macOS ${{ env.MACOSX_DEPLOYMENT_TARGET }}+)
+        if: steps.openssl-cache.outputs.cache-hit != 'true'
+        run: |
+          cd "$RUNNER_TEMP"
+          curl -fsSL --retry 3 -m 300 -o openssl.tar.gz \
+            "https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz"
+          echo "${OPENSSL_SHA256}  openssl.tar.gz" | shasum -a 256 -c -
+          tar -xzf openssl.tar.gz
+          cd "openssl-${OPENSSL_VERSION}"
+          ./Configure "darwin64-${{ matrix.arch }}-cc" shared no-tests --prefix="$HOME/openssl" --libdir=lib
+          make -j"$(sysctl -n hw.ncpu)" build_sw > build.log 2>&1 || { tail -n 80 build.log; exit 1; }
+          make install_sw > install.log 2>&1 || { tail -n 40 install.log; exit 1; }
+
+      - name: Check OpenSSL
+        run: |
+          lib="$HOME/openssl/lib/libcrypto.3.dylib"
+          test -f "$lib"
+          test "$(lipo -archs "$lib")" = "${{ matrix.arch }}"
+          vtool -show-build "$lib" | grep -E 'minos +12\.0'
+
+      - name: Configure
+        # Warnings are reported below, not fatal: this is the first Apple Clang build of the code
+        # (GCC and MSVC builds treat warnings as errors).
+        run: >
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }}
+          -DOPENSSL_ROOT_DIR="$HOME/openssl"
+          -DSU_BUILD_TESTS=ON
+
+      - name: Build
+        run: |
+          cmake --build build --config Release 2>&1 | tee build.log
+          # Apple Clang warnings in the project's own code (libssh's are its own business).
+          grep -E '^/.*: warning: ' build.log | grep -v '/_deps/' | sort -u > warnings.txt || true
+          count=$(wc -l < warnings.txt | tr -d ' ')
+          if [ "$count" -gt 0 ]; then
+            echo "::warning::$count Apple Clang warning(s) in ComUtility code"
+            head -n 50 warnings.txt
+          fi
+
+      - name: Test
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: ctest --test-dir build --output-on-failure -C Release
+
+      - name: Install and deploy (macdeployqt)
+        run: |
+          cmake --install build --prefix "$GITHUB_WORKSPACE/dist" --config Release
+          # libssh's own install rules also drop headers, CMake files and a second libssh copy.
+          rm -rf dist/include dist/lib
+          app=dist/ComUtility.app
+          test -x "$app/Contents/MacOS/ComUtility"
+          test -x "$app/Contents/MacOS/su-fw"
+          test -f "$app/Contents/Resources/qt.conf"
+          test -f "$app/Contents/Resources/comutility.icns"
+          test "$(plutil -extract CFBundleShortVersionString raw "$app/Contents/Info.plist")" = "${{ needs.version.outputs.version }}"
+          test "$(plutil -extract CFBundleIdentifier raw "$app/Contents/Info.plist")" = "us.moses-ai.comutility"
+          for fw in QtCore QtGui QtWidgets QtSvg QtSerialPort QtNetwork; do
+            test -d "$app/Contents/Frameworks/$fw.framework" || { echo "::error::missing $fw.framework"; exit 1; }
+          done
+          test -f "$app/Contents/Frameworks/libssh.4.dylib"
+          test -f "$app/Contents/Frameworks/libcrypto.3.dylib"
+          test -f "$app/Contents/PlugIns/platforms/libqcocoa.dylib"
+          # Every Mach-O file in the bundle: the right processor, macOS 12 or later, and only
+          # references into the bundle or to the system (no Qt SDK, no OpenSSL build folder).
+          bad=0
+          while IFS= read -r f; do
+            file -b "$f" | grep -q 'Mach-O' || continue
+            archs=$(lipo -archs "$f")
+            echo "$archs" | grep -qw "${{ matrix.arch }}" || { echo "::error::$f lacks ${{ matrix.arch }} ($archs)"; bad=1; continue; }
+            # (the Qt frameworks are universal: look at this job's processor only)
+            for m in $(vtool -arch "${{ matrix.arch }}" -show-build "$f" 2>/dev/null | awk '/minos/{print $2}'); do
+              [ "$(printf '%s\n' "$m" "$MACOSX_DEPLOYMENT_TARGET" | sort -V | tail -n1)" = "$MACOSX_DEPLOYMENT_TARGET" ] \
+                || { echo "::error::$f needs macOS $m"; bad=1; }
+            done
+            while IFS= read -r dep; do
+              case "$dep" in
+                @rpath/*|@executable_path/*|@loader_path/*|/usr/lib/*|/System/*) ;;
+                *) echo "::error::$f references $dep"; bad=1 ;;
+              esac
+            done < <(otool -arch "${{ matrix.arch }}" -L "$f" | tail -n +2 | awk '{print $1}')
+          done < <(find "$app" -type f)
+          for exe in ComUtility su-fw; do
+            rpaths=$(otool -l "$app/Contents/MacOS/$exe" | awk '/cmd LC_RPATH/{getline; getline; print $2}')
+            echo "$exe rpaths:" $rpaths
+            echo "$rpaths" | grep -qx '@executable_path/../Frameworks' || { echo "::error::$exe has no rpath to Frameworks"; bad=1; }
+            if echo "$rpaths" | grep -qv '^@'; then echo "::error::$exe keeps an absolute rpath"; bad=1; fi
+          done
+          test "$bad" = 0
+          codesign --verify --deep --strict --verbose=2 "$app"
+          # The bundle starts on its own: the Qt SDK and the OpenSSL build are moved out of the way
+          # (and put back for the cache), so nothing outside the bundle can be picked up.
+          test -n "$QT_ROOT_DIR" && test -d "$QT_ROOT_DIR"
+          mv "$QT_ROOT_DIR" "$QT_ROOT_DIR.hidden"; mv "$HOME/openssl" "$HOME/openssl.hidden"
+          trap 'mv "$QT_ROOT_DIR.hidden" "$QT_ROOT_DIR"; mv "$HOME/openssl.hidden" "$HOME/openssl"' EXIT
+          clean_env="env -u QT_PLUGIN_PATH -u QML2_IMPORT_PATH -u DYLD_LIBRARY_PATH -u DYLD_FRAMEWORK_PATH"
+          $clean_env "$app/Contents/MacOS/ComUtility" --version
+          $clean_env "$app/Contents/MacOS/su-fw" --version | tee su-fw-version.txt
+          grep -q "^su-fw ${{ needs.version.outputs.version }} " su-fw-version.txt
+          $clean_env "$app/Contents/MacOS/su-fw" --help | grep -q 'Exit codes:'
+          find dist -maxdepth 4 | sort
+
+      - name: Package disk image
+        run: |
+          version="${{ needs.version.outputs.version }}"
+          dmg="out/ComUtility-${version}-macos-${{ matrix.suffix }}.dmg"
+          mkdir -p out dmgroot
+          ditto dist/ComUtility.app dmgroot/ComUtility.app
+          cp README.md VERSION.txt dmgroot/
+          ln -s /Applications dmgroot/Applications
+          # hdiutil now and then fails on the hosted runners with "Resource busy": three tries.
+          for try in 1 2 3; do
+            hdiutil create -volname "ComUtility ${version}" -srcfolder dmgroot -fs HFS+ -format UDZO -ov "$dmg" && break
+            echo "hdiutil create failed (try $try)"; sleep 10
+          done
+          test -f "$dmg"
+          # the image mounts and holds a bundle with a valid signature
+          mkdir -p "$RUNNER_TEMP/cu"
+          hdiutil attach -nobrowse -readonly -mountpoint "$RUNNER_TEMP/cu" "$dmg"
+          codesign --verify --deep --strict "$RUNNER_TEMP/cu/ComUtility.app"
+          test -x "$RUNNER_TEMP/cu/ComUtility.app/Contents/MacOS/su-fw"
+          hdiutil detach "$RUNNER_TEMP/cu"
+          ls -la out
+
+      - name: Upload macOS package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ComUtility-macos-${{ matrix.suffix }}
+          path: out/*.dmg
+          if-no-files-found: error
+          retention-days: 14
+
+  # -------------------------------------------------------------------------------------
+  # Release: only for tags v<version>. Publishes the Linux tarball, the Windows portable zip,
+  # the Windows installer and the two macOS disk images with SHA-256 checksums and notes taken
+  # from VERSION.txt.
   # -------------------------------------------------------------------------------------
   release:
     name: GitHub Release
-    needs: [version, build-ubuntu, build-windows]
+    needs: [version, build-ubuntu, build-windows, build-macos]
     if: needs.version.outputs.is_release == 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -290,7 +481,7 @@ jobs:
         run: |
           version="${{ needs.version.outputs.version }}"
           mkdir -p release
-          mv artifacts/*.tar.gz artifacts/*.zip artifacts/*-setup.exe release/
+          mv artifacts/*.tar.gz artifacts/*.zip artifacts/*-setup.exe artifacts/*.dmg release/
           (cd release && sha256sum -- * > SHA256SUMS.txt)
           {
             echo "## ComUtility ${version}"
@@ -309,9 +500,13 @@ jobs:
             echo "| \`ComUtility-${version}-windows-x64-setup.exe\` | Windows installer (x64) |"
             echo "| \`ComUtility-${version}-windows-x64.zip\` | Windows portable build (unzip and run) |"
             echo "| \`ComUtility-${version}-linux-x64.tar.gz\` | Linux x86-64 build with Qt libraries (run \`bin/ComUtility\`; the command-line tool is \`bin/su-fw\`) |"
+            echo "| \`ComUtility-${version}-macos-arm64.dmg\` | macOS 12 or later, Apple Silicon (M1 and newer) |"
+            echo "| \`ComUtility-${version}-macos-x64.dmg\` | macOS 12 or later, Intel |"
             echo "| \`SHA256SUMS.txt\` | checksums |"
             echo
             echo "Built with Qt ${QT_VERSION}. Windows: MSVC 2022, requires the Visual C++ 2022 runtime (\`vc_redist.x64.exe\` is included)."
+            echo
+            echo "macOS: open the disk image and drag ComUtility to Applications. The app is not notarized by Apple, so the first start is refused once: open System Settings > Privacy & Security and choose **Open Anyway**. The command-line tool is \`/Applications/ComUtility.app/Contents/MacOS/su-fw\`. The Rockchip flashing tools are not included on macOS (Rockchip ships them for Windows and Linux only); adb is taken from PATH or set in Preferences."
           } > release/RELEASE_NOTES.md
           cat release/RELEASE_NOTES.md
           ls -la release
@@ -325,6 +520,7 @@ jobs:
             release/*.tar.gz
             release/*.zip
             release/*-setup.exe
+            release/*.dmg
             release/SHA256SUMS.txt
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}

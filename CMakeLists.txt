@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.22)
 # 3.22: ENVIRONMENT_MODIFICATION test property (tests/CMakeLists.txt puts Qt's bin dir on PATH for
 # ctest on Windows). CMakePresets.json (schema v6) separately requires 3.25.
 
+# macOS: the oldest release the app runs on (Qt 6.8 supports macOS 12 and later). Must be set
+# before project(); ignored on every other system.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Oldest macOS the build runs on")
+
 project(ComUtility
     VERSION 0.9.0
     DESCRIPTION "ComUtility - a serial-port terminal for Rockchip Linux boards and MCU shells"
@@ -82,7 +86,11 @@ set(CMAKE_INSTALL_LIBDIR lib CACHE PATH "" FORCE)
 # The installed libssh.so must find the bundled libcrypto next to it (dist/lib): a shared
 # library's own dependencies resolve through *its* RUNPATH, not the executable's.
 set(_su_saved_install_rpath "${CMAKE_INSTALL_RPATH}")
-set(CMAKE_INSTALL_RPATH "$ORIGIN")
+if(APPLE)
+    set(CMAKE_INSTALL_RPATH "@loader_path")
+else()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN")
+endif()
 FetchContent_Declare(libssh
     URL "${SU_LIBSSH_URL}"
     URL_HASH SHA256=${SU_LIBSSH_SHA256})
@@ -366,7 +374,35 @@ set_target_properties(ComUtility PROPERTIES
     MACOSX_BUNDLE_BUNDLE_NAME "ComUtility"
     MACOSX_BUNDLE_GUI_IDENTIFIER "us.moses-ai.comutility"
     MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
-    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+if(APPLE)
+    # ComUtility.app: our own Info.plist (Retina, minimum macOS, local-network notice for SSH) and
+    # an icon made at build time from resources/icons/comutility.png by the macOS tools sips and
+    # iconutil (no .icns file in the source tree).
+    set(_su_icon_png "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/comutility.png")
+    set(_su_iconset "${CMAKE_CURRENT_BINARY_DIR}/comutility.iconset")
+    set(_su_icns "${CMAKE_CURRENT_BINARY_DIR}/comutility.icns")
+    set(_su_icon_commands "")
+    foreach(_su_px 16 32 128 256 512)
+        math(EXPR _su_px2 "${_su_px} * 2")
+        list(APPEND _su_icon_commands
+            COMMAND sips -z ${_su_px} ${_su_px} "${_su_icon_png}" --out "${_su_iconset}/icon_${_su_px}x${_su_px}.png"
+            COMMAND sips -z ${_su_px2} ${_su_px2} "${_su_icon_png}" --out "${_su_iconset}/icon_${_su_px}x${_su_px}@2x.png")
+    endforeach()
+    add_custom_command(OUTPUT "${_su_icns}"
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${_su_iconset}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${_su_iconset}"
+        ${_su_icon_commands}
+        COMMAND iconutil -c icns "${_su_iconset}" -o "${_su_icns}"
+        DEPENDS "${_su_icon_png}"
+        COMMENT "Making comutility.icns"
+        VERBATIM)
+    target_sources(ComUtility PRIVATE "${_su_icns}")
+    set_source_files_properties("${_su_icns}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set_target_properties(ComUtility PROPERTIES
+        MACOSX_BUNDLE_ICON_FILE "comutility.icns"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/packaging/macos/Info.plist.in")
+endif()
 target_link_libraries(ComUtility PRIVATE su_app)
 su_set_compile_options(ComUtility)
 su_copy_runtime_dlls(ComUtility)
@@ -528,57 +564,110 @@ endif()
 # ---------------------------------------------------------------------------
 # Install / deploy  (cmake --install <build> --prefix <dist>)
 # ---------------------------------------------------------------------------
-install(TARGETS ComUtility su_fw
-    BUNDLE  DESTINATION .
-    RUNTIME DESTINATION bin)
-install(FILES README.md VERSION.txt DESTINATION .)
-# The flashing tools assembled next to the executable above (generator expression: the config's own folder
-# for multi-config generators). USE_SOURCE_PERMISSIONS keeps the executable bit of the Linux upgrade_tool.
-if(SU_TOOL_FILES OR SU_TOOL_DRIVER_DIR)
-    install(DIRECTORY "${SU_TOOLS_DIR}/" DESTINATION bin/tools USE_SOURCE_PERMISSIONS)
-endif()
-# libssh installs its own ssh.dll / libssh.so.4 (bin/ resp. lib/) through its install rules;
-# ship the OpenSSL crypto library it depends on the same way.
-if(WIN32 AND SU_OPENSSL_CRYPTO_DLL)
-    install(FILES "${SU_OPENSSL_CRYPTO_DLL}" DESTINATION bin)
-elseif(UNIX AND NOT APPLE)
-    file(REAL_PATH "${OPENSSL_CRYPTO_LIBRARY}" _su_crypto_real)
-    get_filename_component(_su_crypto_dir "${_su_crypto_real}" DIRECTORY)
-    file(GLOB _su_crypto_so "${_su_crypto_dir}/libcrypto.so.*")   # libcrypto.so.3
-    install(FILES ${_su_crypto_so} DESTINATION lib)
-endif()
-
-qt_generate_deploy_app_script(
-    TARGET ComUtility
-    OUTPUT_SCRIPT su_deploy_script
-    NO_UNSUPPORTED_PLATFORM_ERROR
-    NO_TRANSLATIONS)
-# su-fw gets its own run of the same deploy tool (windeployqt / the Linux deploy), so the package
-# carries whatever it needs even where the GUI would not (its libraries are a subset of the GUI's).
-qt_generate_deploy_app_script(
-    TARGET su_fw
-    OUTPUT_SCRIPT su_fw_deploy_script
-    NO_UNSUPPORTED_PLATFORM_ERROR
-    NO_TRANSLATIONS)
 # `cmake --install <build> --prefix dist` with a RELATIVE prefix (as CI does) keeps
 # CMAKE_INSTALL_PREFIX relative inside the install script; CMake's own file(INSTALL)
 # copes, but Qt's deploy support insists on an absolute prefix ("Given qt.conf path is
-# not an absolute path"). Resolve it against the working directory of the install step.
+# not an absolute path"). Resolve it against the working directory of the install step,
+# before any other install rule runs.
 install(CODE [[
     if(NOT IS_ABSOLUTE "${CMAKE_INSTALL_PREFIX}")
         file(REAL_PATH "${CMAKE_INSTALL_PREFIX}" CMAKE_INSTALL_PREFIX)
         message(STATUS "Install prefix resolved to ${CMAKE_INSTALL_PREFIX}")
     endif()
 ]])
-if(WIN32)
-    # Classic windeployqt layout: Qt plugins next to the executable
-    # (bin/platforms/qwindows.dll, bin/styles/..., bin/imageformats/...) instead of
-    # a sibling "plugins" directory. QtDeploySupport only sets a default when the
-    # variable is undefined at install time, so this install(CODE) is the override hook.
-    install(CODE "set(QT_DEPLOY_PLUGINS_DIR \"bin\")")
+install(FILES README.md VERSION.txt DESTINATION .)
+
+if(APPLE)
+    # macOS: <prefix>/ComUtility.app with su-fw inside it (Contents/MacOS/su-fw, next to the GUI as
+    # on the other systems, so both use the same Frameworks folder). macdeployqt runs on a copy of
+    # the BUILD-tree bundle and su-fw: their binaries still carry the build rpaths to the Qt SDK and
+    # to the libssh build folder, so macdeployqt finds every Qt framework, libssh and the OpenSSL
+    # libcrypto that libssh links, copies them into Contents/Frameworks, points every reference
+    # there and leaves only @executable_path/../Frameworks as rpath. (A CMake-installed binary has
+    # its build rpaths stripped, and macdeployqt would then not find libssh at all.)
+    # No bundled flashing tools: Rockchip ships upgrade_tool for Windows and Linux only; adb is
+    # taken from PATH or set in Preferences (docs/QUICKSTART.md).
+    install(CODE "
+        set(_su_app \"\${CMAKE_INSTALL_PREFIX}/ComUtility.app\")
+        file(REMOVE_RECURSE \"\${_su_app}\")
+        execute_process(COMMAND ditto \"$<TARGET_BUNDLE_DIR:ComUtility>\" \"\${_su_app}\" COMMAND_ERROR_IS_FATAL ANY)
+        execute_process(COMMAND ditto \"$<TARGET_FILE:su_fw>\" \"\${_su_app}/Contents/MacOS/su-fw\" COMMAND_ERROR_IS_FATAL ANY)
+    ")
+    # The deploy script's body is a bracket argument: no CMake escapes or variables are processed
+    # in it at configure time; only the include() line below gets the configure-time path.
+    set(_su_macos_deploy_body [==[
+qt_deploy_runtime_dependencies(
+    EXECUTABLE "ComUtility.app"
+    ADDITIONAL_EXECUTABLES "ComUtility.app/Contents/MacOS/su-fw"
+    NO_TRANSLATIONS)
+# macdeployqt deletes the build rpaths it used; any other absolute one goes too (it would point
+# into the build machine's folders).
+foreach(_su_exe ComUtility su-fw)
+    set(_su_bin "${QT_DEPLOY_PREFIX}/ComUtility.app/Contents/MacOS/${_su_exe}")
+    execute_process(COMMAND otool -l "${_su_bin}" OUTPUT_VARIABLE _su_loads COMMAND_ERROR_IS_FATAL ANY)
+    string(REGEX MATCHALL "path [^\n ]+ \\(offset" _su_rpaths "${_su_loads}")
+    foreach(_su_rpath IN LISTS _su_rpaths)
+        string(REGEX REPLACE "^path ([^\n ]+) \\(offset$" "\\1" _su_rpath "${_su_rpath}")
+        if(NOT _su_rpath MATCHES "^@")
+            message(STATUS "removing rpath ${_su_rpath} from ${_su_exe}")
+            execute_process(COMMAND install_name_tool -delete_rpath "${_su_rpath}" "${_su_bin}"
+                            COMMAND_ERROR_IS_FATAL ANY)
+        endif()
+    endforeach()
+endforeach()
+# Signature: Apple Silicon runs no unsigned code, and the install_name_tool edits above and in
+# macdeployqt break the linker's ad-hoc signature, so the whole bundle is signed ad hoc again
+# (no Developer ID: the first start needs "Open Anyway" in System Settings > Privacy & Security).
+execute_process(COMMAND codesign --force --deep --sign - "${QT_DEPLOY_PREFIX}/ComUtility.app"
+                COMMAND_ERROR_IS_FATAL ANY)
+execute_process(COMMAND codesign --verify --deep --strict "${QT_DEPLOY_PREFIX}/ComUtility.app"
+                COMMAND_ERROR_IS_FATAL ANY)
+]==])
+    set(su_macos_deploy_script "${CMAKE_CURRENT_BINARY_DIR}/su_deploy_macos.cmake")
+    file(GENERATE OUTPUT "${su_macos_deploy_script}"
+        CONTENT "include(\"${QT_DEPLOY_SUPPORT}\")\n${_su_macos_deploy_body}")
+    install(SCRIPT "${su_macos_deploy_script}")
+else()
+    install(TARGETS ComUtility su_fw
+        RUNTIME DESTINATION bin)
+    # The flashing tools assembled next to the executable above (generator expression: the config's own folder
+    # for multi-config generators). USE_SOURCE_PERMISSIONS keeps the executable bit of the Linux upgrade_tool.
+    if(SU_TOOL_FILES OR SU_TOOL_DRIVER_DIR)
+        install(DIRECTORY "${SU_TOOLS_DIR}/" DESTINATION bin/tools USE_SOURCE_PERMISSIONS)
+    endif()
+    # libssh installs its own ssh.dll / libssh.so.4 (bin/ resp. lib/) through its install rules;
+    # ship the OpenSSL crypto library it depends on the same way.
+    if(WIN32 AND SU_OPENSSL_CRYPTO_DLL)
+        install(FILES "${SU_OPENSSL_CRYPTO_DLL}" DESTINATION bin)
+    elseif(UNIX)
+        file(REAL_PATH "${OPENSSL_CRYPTO_LIBRARY}" _su_crypto_real)
+        get_filename_component(_su_crypto_dir "${_su_crypto_real}" DIRECTORY)
+        file(GLOB _su_crypto_so "${_su_crypto_dir}/libcrypto.so.*")   # libcrypto.so.3
+        install(FILES ${_su_crypto_so} DESTINATION lib)
+    endif()
+
+    qt_generate_deploy_app_script(
+        TARGET ComUtility
+        OUTPUT_SCRIPT su_deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR
+        NO_TRANSLATIONS)
+    # su-fw gets its own run of the same deploy tool (windeployqt / the Linux deploy), so the package
+    # carries whatever it needs even where the GUI would not (its libraries are a subset of the GUI's).
+    qt_generate_deploy_app_script(
+        TARGET su_fw
+        OUTPUT_SCRIPT su_fw_deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR
+        NO_TRANSLATIONS)
+    if(WIN32)
+        # Classic windeployqt layout: Qt plugins next to the executable
+        # (bin/platforms/qwindows.dll, bin/styles/..., bin/imageformats/...) instead of
+        # a sibling "plugins" directory. QtDeploySupport only sets a default when the
+        # variable is undefined at install time, so this install(CODE) is the override hook.
+        install(CODE "set(QT_DEPLOY_PLUGINS_DIR \"bin\")")
+    endif()
+    install(SCRIPT "${su_deploy_script}")
+    install(SCRIPT "${su_fw_deploy_script}")
 endif()
-install(SCRIPT "${su_deploy_script}")
-install(SCRIPT "${su_fw_deploy_script}")
 
 # ---------------------------------------------------------------------------
 # Summary
